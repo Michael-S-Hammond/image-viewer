@@ -162,12 +162,28 @@
                                             BorderThickness="0"
                                             HorizontalAlignment="Right"
                                             Width="20">
-                                    <Path Name="Arrow"
-                                          HorizontalAlignment="Right"
-                                          VerticalAlignment="Center"
-                                          Data="M 0 0 L 4 4 L 8 0 Z"
-                                          Fill="{StaticResource ForegroundBrush}"
-                                          Margin="0,0,4,0"/>
+                                    <ToggleButton.Template>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border Name="ToggleBorder"
+                                                    Background="{TemplateBinding Background}"
+                                                    BorderThickness="0">
+                                                <Path Name="Arrow"
+                                                      HorizontalAlignment="Right"
+                                                      VerticalAlignment="Center"
+                                                      Data="M 0 0 L 4 4 L 8 0 Z"
+                                                      Fill="{StaticResource ForegroundBrush}"
+                                                      Margin="0,0,4,0"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource ButtonHoverBrush}"/>
+                                                </Trigger>
+                                                <Trigger Property="IsPressed" Value="True">
+                                                    <Setter TargetName="ToggleBorder" Property="Background" Value="{StaticResource AccentBrush}"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </ToggleButton.Template>
                                 </ToggleButton>
                             </Grid>
                         </Border>
