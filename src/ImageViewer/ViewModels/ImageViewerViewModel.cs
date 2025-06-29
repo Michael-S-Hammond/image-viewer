@@ -63,6 +63,8 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
     public bool IsStaticImage => !IsAnimatedGif && !IsVideo;
 
+    public bool HasLoopableContent => IsAnimatedGif || IsVideo;
+
     public string CurrentFolderPath
     {
         get => _currentFolderPath;
@@ -307,6 +309,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsAnimatedGif));
         OnPropertyChanged(nameof(IsVideo));
         OnPropertyChanged(nameof(IsStaticImage));
+        OnPropertyChanged(nameof(HasLoopableContent));
         OnPropertyChanged(nameof(WindowTitle));
     }
 

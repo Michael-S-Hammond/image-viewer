@@ -38,12 +38,8 @@
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
             <CheckBox Name="ChkLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
                       IsChecked="{Binding IsLoopEnabled}" 
-                      Visibility="{Binding IsAnimatedGif, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      Visibility="{Binding HasLoopableContent, Converter={StaticResource BooleanToVisibilityConverter}}"
                       ToolTip="Loop animated content"/>
-            <CheckBox Name="ChkVideoLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
-                      IsChecked="{Binding IsLoopEnabled}" 
-                      Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      ToolTip="Loop video content"/>
         </StackPanel>
         
         <!-- Main Image Display Area -->
