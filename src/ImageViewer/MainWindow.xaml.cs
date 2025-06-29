@@ -96,4 +96,22 @@ public partial class MainWindow : Window
     {
         VideoPlayer.Play();
     }
+
+    private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.IsLoopEnabled)
+        {
+            VideoPlayer.Position = TimeSpan.Zero;
+            VideoPlayer.Play();
+        }
+    }
+
+    private void GifPlayer_MediaEnded(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.IsLoopEnabled)
+        {
+            GifPlayer.Position = TimeSpan.Zero;
+            GifPlayer.Play();
+        }
+    }
 }

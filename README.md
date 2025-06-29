@@ -8,8 +8,9 @@ A .NET 8 WPF application for viewing images and videos with navigation capabilit
 - **Image Display**: View images with proper scaling and aspect ratio preservation
 - **Navigation**: Navigate through media files using arrow keys or UI buttons
 - **Format Support**: Supports PNG, JPG, JPEG, GIF, BMP, TIFF, MP4 formats
-- **GIF Animation**: Animated GIF support with MediaElement
-- **Video Playback**: MP4 video support with play/pause/stop controls
+- **GIF Animation**: Animated GIF support with MediaElement and loop option
+- **Video Playback**: MP4 video support with play/pause/stop controls and loop option
+- **Loop Control**: Toggle looping for animated GIFs and videos
 - **Media Information**: Display file name, size, and current position
 
 ## Requirements
@@ -32,7 +33,8 @@ dotnet run
 4. MP4 videos will auto-play when selected
 5. Use video controls (Play/Pause/Stop) for MP4 playback
 6. Press Spacebar to toggle video play/pause
-7. Media information is shown in the status bar
+7. Use the "Loop" checkbox to enable/disable looping for GIFs and videos
+8. Media information is shown in the status bar
 
 ## Architecture
 

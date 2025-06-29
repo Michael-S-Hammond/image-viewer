@@ -15,6 +15,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     private Uri? _currentGifSource;
     private Uri? _currentVideoSource;
     private string _currentFolderPath = string.Empty;
+    private bool _isLoopEnabled = true;
 
     public ImageViewerViewModel()
     {
@@ -91,6 +92,16 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     public string WindowTitle => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
         ? $"Image Viewer - {_images[_currentImageIndex].FileName}" 
         : "Image Viewer";
+
+    public bool IsLoopEnabled
+    {
+        get => _isLoopEnabled;
+        set
+        {
+            _isLoopEnabled = value;
+            OnPropertyChanged();
+        }
+    }
 
     public void LoadImagesFromFolder(string folderPath)
     {

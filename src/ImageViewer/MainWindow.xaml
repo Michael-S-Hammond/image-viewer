@@ -17,6 +17,14 @@
             <Button Name="BtnSelectFolder" Content="Select Folder" Click="BtnSelectFolder_Click"/>
             <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
+            <CheckBox Name="ChkLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
+                      IsChecked="{Binding IsLoopEnabled}" 
+                      Visibility="{Binding IsAnimatedGif, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      ToolTip="Loop animated content"/>
+            <CheckBox Name="ChkVideoLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
+                      IsChecked="{Binding IsLoopEnabled}" 
+                      Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"
+                      ToolTip="Loop video content"/>
         </StackPanel>
         
         <!-- Main Image Display Area -->
@@ -30,13 +38,15 @@
                 <Viewbox Stretch="Uniform" Name="GifViewbox"
                          Visibility="{Binding IsAnimatedGif, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <MediaElement Name="GifPlayer" Source="{Binding CurrentGifSource}" 
-                                  LoadedBehavior="Play" UnloadedBehavior="Manual"/>
+                                  LoadedBehavior="Play" UnloadedBehavior="Manual"
+                                  MediaEnded="GifPlayer_MediaEnded"/>
                 </Viewbox>
                 <Viewbox Stretch="Uniform" Name="VideoViewbox"
                          Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}">
                     <MediaElement Name="VideoPlayer" Source="{Binding CurrentVideoSource}" 
                                   LoadedBehavior="Manual" UnloadedBehavior="Manual"
-                                  MediaOpened="VideoPlayer_MediaOpened"/>
+                                  MediaOpened="VideoPlayer_MediaOpened"
+                                  MediaEnded="VideoPlayer_MediaEnded"/>
                 </Viewbox>
             </Grid>
         </Border>
