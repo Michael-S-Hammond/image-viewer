@@ -260,14 +260,37 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="MenuItem">
-                    <Border Background="{TemplateBinding Background}" 
-                            BorderThickness="0" 
-                            Padding="8,4">
-                        <ContentPresenter ContentSource="Header"/>
-                    </Border>
+                    <Grid>
+                        <Border Name="Border"
+                                Background="{TemplateBinding Background}" 
+                                BorderThickness="0" 
+                                Padding="8,4">
+                            <ContentPresenter Name="HeaderHost"
+                                            ContentSource="Header"
+                                            RecognizesAccessKey="True"/>
+                        </Border>
+                        <Popup Name="Popup"
+                               Placement="Bottom"
+                               IsOpen="{TemplateBinding IsSubmenuOpen}"
+                               AllowsTransparency="True"
+                               Focusable="False"
+                               PopupAnimation="Fade">
+                            <Border Name="SubmenuBorder"
+                                    Background="{StaticResource MenuBackgroundBrush}"
+                                    BorderBrush="{StaticResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="3"
+                                    Padding="2">
+                                <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle"/>
+                            </Border>
+                        </Popup>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter Property="Background" Value="{StaticResource MenuHoverBrush}"/>
+                            <Setter TargetName="Border" Property="Background" Value="{StaticResource MenuHoverBrush}"/>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="False">
+                            <Setter TargetName="Popup" Property="Visibility" Value="Collapsed"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
