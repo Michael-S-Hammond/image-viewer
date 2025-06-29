@@ -17,13 +17,13 @@ public partial class MainWindow : Window
         UpdateThemeMenuChecks();
     }
 
-    private void BtnSelectFolder_Click(object sender, RoutedEventArgs e)
+    private void MenuItem_OpenFolder_Click(object sender, RoutedEventArgs e)
     {
         try
         {
             var dialog = new OpenFolderDialog
             {
-                Title = "Select Image Folder"
+                Title = "Open Image Folder"
             };
 
             if (dialog.ShowDialog() == true)
@@ -33,7 +33,7 @@ public partial class MainWindow : Window
         }
         catch (Exception ex)
         {
-            MessageBox.Show($"Error selecting folder: {ex.Message}", "Error", 
+            MessageBox.Show($"Error opening folder: {ex.Message}", "Error", 
                 MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }

@@ -16,6 +16,9 @@
         
         <!-- Menu Bar -->
         <Menu Grid.Row="0">
+            <MenuItem Header="_File">
+                <MenuItem Name="MenuOpenFolder" Header="_Open Folder..." Click="MenuItem_OpenFolder_Click"/>
+            </MenuItem>
             <MenuItem Header="_Theme">
                 <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
                 <MenuItem Name="MenuLightTheme" Header="_Light" Click="MenuItem_Light_Click" IsCheckable="True" IsChecked="False"/>
@@ -25,7 +28,6 @@
         
         <!-- Top Control Bar -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{DynamicResource TopBarStyle}" Margin="5">
-            <Button Name="BtnSelectFolder" Content="Select Folder" Click="BtnSelectFolder_Click"/>
             <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
             <TextBlock Text="Sort by:" VerticalAlignment="Center" Margin="10,0,5,0"/>
