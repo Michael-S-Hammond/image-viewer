@@ -15,6 +15,7 @@ public partial class MainWindow : Window
         _viewModel = new ImageViewerViewModel();
         DataContext = _viewModel;
         UpdateThemeMenuChecks();
+        UpdateSortMenuChecks();
     }
 
     private void MenuItem_OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -135,10 +136,35 @@ public partial class MainWindow : Window
         UpdateThemeMenuChecks();
     }
 
+    private void MenuItem_SortName_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentSortOption = SortOption.Name;
+        UpdateSortMenuChecks();
+    }
+
+    private void MenuItem_SortDate_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentSortOption = SortOption.Date;
+        UpdateSortMenuChecks();
+    }
+
+    private void MenuItem_SortRandom_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentSortOption = SortOption.Random;
+        UpdateSortMenuChecks();
+    }
+
     private void UpdateThemeMenuChecks()
     {
         MenuDarkTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Dark;
         MenuLightTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Light;
         MenuEnergyTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Energy;
+    }
+
+    private void UpdateSortMenuChecks()
+    {
+        MenuSortName.IsChecked = _viewModel.CurrentSortOption == SortOption.Name;
+        MenuSortDate.IsChecked = _viewModel.CurrentSortOption == SortOption.Date;
+        MenuSortRandom.IsChecked = _viewModel.CurrentSortOption == SortOption.Random;
     }
 }

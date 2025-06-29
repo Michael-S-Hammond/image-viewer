@@ -18,6 +18,12 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Name="MenuOpenFolder" Header="_Open Folder..." Click="MenuItem_OpenFolder_Click"/>
+                <Separator/>
+                <MenuItem Header="_Sort By">
+                    <MenuItem Name="MenuSortName" Header="By _Name" Click="MenuItem_SortName_Click" IsCheckable="True" IsChecked="True"/>
+                    <MenuItem Name="MenuSortDate" Header="By _Date" Click="MenuItem_SortDate_Click" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Name="MenuSortRandom" Header="By _Random" Click="MenuItem_SortRandom_Click" IsCheckable="True" IsChecked="False"/>
+                </MenuItem>
             </MenuItem>
             <MenuItem Header="_Theme">
                 <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
@@ -30,24 +36,6 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{DynamicResource TopBarStyle}" Margin="5">
             <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
-            <TextBlock Text="Sort by:" VerticalAlignment="Center" Margin="10,0,5,0"/>
-            <ComboBox Name="CmbSortOption" VerticalAlignment="Center" Margin="0,0,10,0" 
-                      MinWidth="100" SelectedItem="{Binding CurrentSortOption}"
-                      ToolTip="Choose sorting method">
-                <ComboBox.ItemContainerStyle>
-                    <Style TargetType="ComboBoxItem">
-                        <Style.Resources>
-                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#484848"/>
-                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF"/>
-                        </Style.Resources>
-                    </Style>
-                </ComboBox.ItemContainerStyle>
-                <ComboBox.Items>
-                    <x:Static Member="models:SortOption.Name"/>
-                    <x:Static Member="models:SortOption.Date"/>
-                    <x:Static Member="models:SortOption.Random"/>
-                </ComboBox.Items>
-            </ComboBox>
             <CheckBox Name="ChkLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
                       IsChecked="{Binding IsLoopEnabled}" 
                       Visibility="{Binding IsAnimatedGif, Converter={StaticResource BooleanToVisibilityConverter}}"
