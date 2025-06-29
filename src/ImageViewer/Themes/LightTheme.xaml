@@ -19,6 +19,16 @@
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
     </Style>
     
+    <!-- Grid Style -->
+    <Style TargetType="Grid">
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+    </Style>
+    
+    <!-- StackPanel Style for Bottom Controls -->
+    <Style x:Key="BottomControlsStyle" TargetType="StackPanel">
+        <Setter Property="Background" Value="{StaticResource BackgroundBrush}"/>
+    </Style>
+    
     <!-- Button Style -->
     <Style TargetType="Button">
         <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>

@@ -4,8 +4,9 @@
         xmlns:models="clr-namespace:ImageViewer.Models"
         Title="{Binding WindowTitle}" Height="600" Width="800"
         KeyDown="Window_KeyDown"
-        WindowStartupLocation="CenterScreen">
-    <Grid>
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource BackgroundBrush}"
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -71,7 +72,8 @@
         </Border>
         
         <!-- Bottom Controls -->
-        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
+        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5" 
+                    Style="{DynamicResource BottomControlsStyle}">
             <!-- Navigation Controls -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
                 <Button Name="BtnPrevious" Content="← Previous" Click="BtnPrevious_Click" 
