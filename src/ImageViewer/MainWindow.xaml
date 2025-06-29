@@ -36,10 +36,6 @@
         <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{DynamicResource TopBarStyle}" Margin="5">
             <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
-            <CheckBox Name="ChkLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
-                      IsChecked="{Binding IsLoopEnabled}" 
-                      Visibility="{Binding HasLoopableContent, Converter={StaticResource BooleanToVisibilityConverter}}"
-                      ToolTip="Loop animated content"/>
         </StackPanel>
         
         <!-- Main Image Display Area -->
@@ -84,10 +80,16 @@
             
             <!-- Video Controls -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" 
-                        Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}">
-                <Button Name="BtnPlay" Content="▶ Play" Click="BtnPlay_Click" Margin="5,0"/>
-                <Button Name="BtnPause" Content="⏸ Pause" Click="BtnPause_Click" Margin="5,0"/>
-                <Button Name="BtnStop" Content="⏹ Stop" Click="BtnStop_Click" Margin="5,0"/>
+                        Visibility="{Binding HasLoopableContent, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button Name="BtnPlay" Content="▶ Play" Click="BtnPlay_Click" Margin="5,0"
+                        Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Button Name="BtnPause" Content="⏸ Pause" Click="BtnPause_Click" Margin="5,0"
+                        Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <Button Name="BtnStop" Content="⏹ Stop" Click="BtnStop_Click" Margin="5,0"
+                        Visibility="{Binding IsVideo, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <CheckBox Name="ChkLoop" Content="Loop" VerticalAlignment="Center" Margin="10,0"
+                          IsChecked="{Binding IsLoopEnabled}" 
+                          ToolTip="Loop animated content"/>
             </StackPanel>
         </StackPanel>
     </Grid>
