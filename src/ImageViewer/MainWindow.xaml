@@ -6,6 +6,13 @@
         KeyDown="Window_KeyDown"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}">
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{x:Static ApplicationCommands.Open}"/>
+        <KeyBinding Key="D1" Modifiers="Ctrl" Command="{x:Static ImageViewer:MainWindow.SortByNameCommand}"/>
+        <KeyBinding Key="D2" Modifiers="Ctrl" Command="{x:Static ImageViewer:MainWindow.SortByDateCommand}"/>
+        <KeyBinding Key="D3" Modifiers="Ctrl" Command="{x:Static ImageViewer:MainWindow.SortByRandomCommand}"/>
+        <KeyBinding Key="F4" Modifiers="Alt" Command="{x:Static ApplicationCommands.Close}"/>
+    </Window.InputBindings>
     <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,13 +24,13 @@
         <!-- Menu Bar -->
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
-                <MenuItem Name="MenuOpenFolder" Header="_Open Folder..." Click="MenuItem_OpenFolder_Click"/>
+                <MenuItem Name="MenuOpenFolder" Header="_Open Folder..." Click="MenuItem_OpenFolder_Click" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Sort By">
-                    <MenuItem Name="MenuSortName" Header="By _Name" Click="MenuItem_SortName_Click" IsCheckable="True" IsChecked="True"/>
-                    <MenuItem Name="MenuSortDate" Header="By _Date" Click="MenuItem_SortDate_Click" IsCheckable="True" IsChecked="False"/>
-                    <MenuItem Name="MenuSortRandom" Header="By _Random" Click="MenuItem_SortRandom_Click" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Name="MenuSortName" Header="By _Name" Click="MenuItem_SortName_Click" IsCheckable="True" IsChecked="True" InputGestureText="Ctrl+1"/>
+                    <MenuItem Name="MenuSortDate" Header="By _Date" Click="MenuItem_SortDate_Click" IsCheckable="True" IsChecked="False" InputGestureText="Ctrl+2"/>
+                    <MenuItem Name="MenuSortRandom" Header="By _Random" Click="MenuItem_SortRandom_Click" IsCheckable="True" IsChecked="False" InputGestureText="Ctrl+3"/>
                 </MenuItem>
-                <MenuItem Name="MenuExit" Header="E_xit" Click="MenuItem_Exit_Click"/>
+                <MenuItem Name="MenuExit" Header="E_xit" Click="MenuItem_Exit_Click" InputGestureText="Alt+F4"/>
             </MenuItem>
             <MenuItem Header="_Theme">
                 <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>

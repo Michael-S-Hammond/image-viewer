@@ -9,6 +9,10 @@ public partial class MainWindow : Window
 {
     private readonly ImageViewerViewModel _viewModel;
 
+    public static readonly RoutedCommand SortByNameCommand = new RoutedCommand();
+    public static readonly RoutedCommand SortByDateCommand = new RoutedCommand();
+    public static readonly RoutedCommand SortByRandomCommand = new RoutedCommand();
+
     public MainWindow()
     {
         InitializeComponent();
@@ -16,6 +20,13 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
         UpdateThemeMenuChecks();
         UpdateSortMenuChecks();
+        
+        // Set up command bindings
+        CommandBindings.Add(new CommandBinding(ApplicationCommands.Open, MenuItem_OpenFolder_Click));
+        CommandBindings.Add(new CommandBinding(SortByNameCommand, MenuItem_SortName_Click));
+        CommandBindings.Add(new CommandBinding(SortByDateCommand, MenuItem_SortDate_Click));
+        CommandBindings.Add(new CommandBinding(SortByRandomCommand, MenuItem_SortRandom_Click));
+        CommandBindings.Add(new CommandBinding(ApplicationCommands.Close, MenuItem_Exit_Click));
     }
 
     private void MenuItem_OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -51,20 +62,53 @@ public partial class MainWindow : Window
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
-        switch (e.Key)
+        // Handle Ctrl key combinations
+        if (Keyboard.Modifiers == ModifierKeys.Control)
         {
-            case Key.Left:
-                _viewModel.NavigatePrevious();
-                break;
-            case Key.Right:
-                _viewModel.NavigateNext();
-                break;
-            case Key.Space:
-                if (_viewModel.IsVideo)
-                {
-                    ToggleVideoPlayback();
-                }
-                break;
+            switch (e.Key)
+            {
+                case Key.O:
+                    MenuItem_OpenFolder_Click(this, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+                case Key.D1:
+                    MenuItem_SortName_Click(this, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+                case Key.D2:
+                    MenuItem_SortDate_Click(this, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+                case Key.D3:
+                    MenuItem_SortRandom_Click(this, new RoutedEventArgs());
+                    e.Handled = true;
+                    break;
+            }
+        }
+        // Handle Alt+F4 for exit (though this is usually handled by Windows)
+        else if (Keyboard.Modifiers == ModifierKeys.Alt && e.Key == Key.F4)
+        {
+            MenuItem_Exit_Click(this, new RoutedEventArgs());
+            e.Handled = true;
+        }
+        // Handle existing navigation keys
+        else
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    _viewModel.NavigatePrevious();
+                    break;
+                case Key.Right:
+                    _viewModel.NavigateNext();
+                    break;
+                case Key.Space:
+                    if (_viewModel.IsVideo)
+                    {
+                        ToggleVideoPlayback();
+                    }
+                    break;
+            }
         }
     }
 
