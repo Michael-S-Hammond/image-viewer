@@ -18,12 +18,12 @@
         <Menu Grid.Row="0">
             <MenuItem Header="_File">
                 <MenuItem Name="MenuOpenFolder" Header="_Open Folder..." Click="MenuItem_OpenFolder_Click"/>
-                <Separator/>
                 <MenuItem Header="_Sort By">
                     <MenuItem Name="MenuSortName" Header="By _Name" Click="MenuItem_SortName_Click" IsCheckable="True" IsChecked="True"/>
                     <MenuItem Name="MenuSortDate" Header="By _Date" Click="MenuItem_SortDate_Click" IsCheckable="True" IsChecked="False"/>
                     <MenuItem Name="MenuSortRandom" Header="By _Random" Click="MenuItem_SortRandom_Click" IsCheckable="True" IsChecked="False"/>
                 </MenuItem>
+                <MenuItem Name="MenuExit" Header="E_xit" Click="MenuItem_Exit_Click"/>
             </MenuItem>
             <MenuItem Header="_Theme">
                 <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>

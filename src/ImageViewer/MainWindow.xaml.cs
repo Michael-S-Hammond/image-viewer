@@ -154,6 +154,11 @@ public partial class MainWindow : Window
         UpdateSortMenuChecks();
     }
 
+    private void MenuItem_Exit_Click(object sender, RoutedEventArgs e)
+    {
+        Close();
+    }
+
     private void UpdateThemeMenuChecks()
     {
         MenuDarkTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Dark;
