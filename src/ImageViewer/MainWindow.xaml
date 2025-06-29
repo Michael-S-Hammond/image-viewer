@@ -35,8 +35,6 @@
         
         <!-- Top Control Bar -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{DynamicResource TopBarStyle}" Margin="5">
-            <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
-                       Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
         </StackPanel>
         
         <!-- Main Image Display Area -->
@@ -92,6 +90,11 @@
                           IsChecked="{Binding IsLoopEnabled}" 
                           ToolTip="Loop animated content"/>
             </StackPanel>
+            
+            <!-- Current Folder Display -->
+            <TextBlock Name="TxtCurrentFolder" HorizontalAlignment="Center" Margin="10,5,10,0" 
+                       Text="{Binding CurrentFolderPath}" FontWeight="Bold"
+                       Visibility="{Binding HasImages, Converter={StaticResource BooleanToVisibilityConverter}}"/>
         </StackPanel>
     </Grid>
 </Window>

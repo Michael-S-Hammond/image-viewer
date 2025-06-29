@@ -83,6 +83,8 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
     public int TotalImages => _images.Count;
 
+    public bool HasImages => _images.Count > 0;
+
     public bool CanNavigatePrevious => _currentImageIndex > 0;
     public bool CanNavigateNext => _currentImageIndex < _images.Count - 1;
 
@@ -304,6 +306,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     {
         OnPropertyChanged(nameof(CurrentImageIndex));
         OnPropertyChanged(nameof(TotalImages));
+        OnPropertyChanged(nameof(HasImages));
         OnPropertyChanged(nameof(CanNavigatePrevious));
         OnPropertyChanged(nameof(CanNavigateNext));
         OnPropertyChanged(nameof(IsAnimatedGif));
