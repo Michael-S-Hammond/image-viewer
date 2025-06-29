@@ -23,7 +23,7 @@
         </Menu>
         
         <!-- Top Control Bar -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{StaticResource TopBarStyle}" Margin="5">
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{DynamicResource TopBarStyle}" Margin="5">
             <Button Name="BtnSelectFolder" Content="Select Folder" Click="BtnSelectFolder_Click"/>
             <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
