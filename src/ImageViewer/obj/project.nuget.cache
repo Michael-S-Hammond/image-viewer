@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "SrLogRDJkT6ETUid8cThCaLiZEzkLdY8RGd95xgrMIl1yTMIJ9UIS47eHMct+w2965raq0+YXHlUz5iVNOqTSg==",
+  "success": true,
+  "projectFilePath": "/mnt/e/src/claude_ai/ImageViewer/src/ImageViewer/ImageViewer.csproj",
+  "expectedPackageFiles": [
+    "/home/michael/.nuget/packages/microsoft.toolkit.mvvm/7.1.2/microsoft.toolkit.mvvm.7.1.2.nupkg.sha512"
+  ],
+  "logs": []
+}

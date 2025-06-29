@@ -1,0 +1,183 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Windows.Media.Imaging;
+using ImageViewer.Models;
+using ImageViewer.Services;
+
+namespace ImageViewer;
+
+public class ImageViewerViewModel : INotifyPropertyChanged
+{
+    private readonly ImageService _imageService;
+    private List<ImageInfo> _images = new();
+    private int _currentImageIndex = -1;
+    private BitmapImage? _currentImageSource;
+    private Uri? _currentGifSource;
+    private string _currentFolderPath = string.Empty;
+
+    public ImageViewerViewModel()
+    {
+        _imageService = new ImageService();
+    }
+
+    public BitmapImage? CurrentImageSource
+    {
+        get => _currentImageSource;
+        private set
+        {
+            _currentImageSource = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public Uri? CurrentGifSource
+    {
+        get => _currentGifSource;
+        private set
+        {
+            _currentGifSource = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsAnimatedGif => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+        && _images[_currentImageIndex].Extension.Equals(".gif", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsStaticImage => !IsAnimatedGif;
+
+    public string CurrentFolderPath
+    {
+        get => _currentFolderPath;
+        private set
+        {
+            _currentFolderPath = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public int CurrentImageIndex
+    {
+        get => _currentImageIndex + 1;
+        private set => OnPropertyChanged();
+    }
+
+    public int TotalImages => _images.Count;
+
+    public bool CanNavigatePrevious => _currentImageIndex > 0;
+    public bool CanNavigateNext => _currentImageIndex < _images.Count - 1;
+
+    public string CurrentImageName => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+        ? _images[_currentImageIndex].FileName 
+        : string.Empty;
+
+    public string CurrentImageSize => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+        ? _images[_currentImageIndex].FileSize 
+        : string.Empty;
+
+    public string WindowTitle => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+        ? $"Image Viewer - {_images[_currentImageIndex].FileName}" 
+        : "Image Viewer";
+
+    public void LoadImagesFromFolder(string folderPath)
+    {
+        try
+        {
+            _images = _imageService.LoadImagesFromFolder(folderPath);
+            CurrentFolderPath = folderPath;
+            
+            if (_images.Count > 0)
+            {
+                _currentImageIndex = 0;
+                LoadCurrentImage();
+            }
+            else
+            {
+                _currentImageIndex = -1;
+                CurrentImageSource = null;
+            }
+
+            UpdateNavigationProperties();
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error loading images: {ex.Message}", "Error", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+        }
+    }
+
+    public void NavigatePrevious()
+    {
+        if (CanNavigatePrevious)
+        {
+            _currentImageIndex--;
+            LoadCurrentImage();
+            UpdateNavigationProperties();
+        }
+    }
+
+    public void NavigateNext()
+    {
+        if (CanNavigateNext)
+        {
+            _currentImageIndex++;
+            LoadCurrentImage();
+            UpdateNavigationProperties();
+        }
+    }
+
+    private void LoadCurrentImage()
+    {
+        if (_currentImageIndex >= 0 && _currentImageIndex < _images.Count)
+        {
+            try
+            {
+                var currentImage = _images[_currentImageIndex];
+                
+                if (currentImage.Extension.Equals(".gif", StringComparison.OrdinalIgnoreCase))
+                {
+                    CurrentGifSource = new Uri(currentImage.FilePath);
+                    CurrentImageSource = null;
+                }
+                else
+                {
+                    var bitmap = new BitmapImage();
+                    bitmap.BeginInit();
+                    bitmap.UriSource = new Uri(currentImage.FilePath);
+                    bitmap.CacheOption = BitmapCacheOption.OnLoad;
+                    bitmap.EndInit();
+                    bitmap.Freeze();
+                    
+                    CurrentImageSource = bitmap;
+                    CurrentGifSource = null;
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Error loading image: {ex.Message}", "Error", 
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                CurrentImageSource = null;
+                CurrentGifSource = null;
+            }
+        }
+    }
+
+    private void UpdateNavigationProperties()
+    {
+        OnPropertyChanged(nameof(CurrentImageIndex));
+        OnPropertyChanged(nameof(TotalImages));
+        OnPropertyChanged(nameof(CanNavigatePrevious));
+        OnPropertyChanged(nameof(CanNavigateNext));
+        OnPropertyChanged(nameof(CurrentImageName));
+        OnPropertyChanged(nameof(CurrentImageSize));
+        OnPropertyChanged(nameof(IsAnimatedGif));
+        OnPropertyChanged(nameof(IsStaticImage));
+        OnPropertyChanged(nameof(WindowTitle));
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}

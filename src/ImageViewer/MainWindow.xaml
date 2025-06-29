@@ -1,0 +1,61 @@
+<Window x:Class="ImageViewer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="{Binding WindowTitle}" Height="600" Width="800"
+        KeyDown="Window_KeyDown"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Top Menu Bar -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="LightGray" Margin="5">
+            <Button Name="BtnSelectFolder" Content="Select Folder" Click="BtnSelectFolder_Click"/>
+            <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
+                       Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
+        </StackPanel>
+        
+        <!-- Main Image Display Area -->
+        <Border Grid.Row="1" Background="Black" Margin="5">
+            <Grid>
+                <Viewbox Stretch="Uniform" Name="ImageViewbox" 
+                         Visibility="{Binding IsStaticImage, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <Image Name="MainImage" Source="{Binding CurrentImageSource}" 
+                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Viewbox>
+                <Viewbox Stretch="Uniform" Name="GifViewbox"
+                         Visibility="{Binding IsAnimatedGif, Converter={StaticResource BooleanToVisibilityConverter}}">
+                    <MediaElement Name="GifPlayer" Source="{Binding CurrentGifSource}" 
+                                  LoadedBehavior="Play" UnloadedBehavior="Manual"/>
+                </Viewbox>
+            </Grid>
+        </Border>
+        
+        <!-- Bottom Controls -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="5">
+            <Button Name="BtnPrevious" Content="← Previous" Click="BtnPrevious_Click" 
+                    IsEnabled="{Binding CanNavigatePrevious}"/>
+            <TextBlock VerticalAlignment="Center" Margin="10,0">
+                <Run Text="{Binding CurrentImageIndex}"/>
+                <Run Text=" of "/>
+                <Run Text="{Binding TotalImages}"/>
+            </TextBlock>
+            <Button Name="BtnNext" Content="Next →" Click="BtnNext_Click" 
+                    IsEnabled="{Binding CanNavigateNext}"/>
+        </StackPanel>
+        
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="3">
+            <StatusBarItem>
+                <TextBlock Text="{Binding CurrentImageName}"/>
+            </StatusBarItem>
+            <StatusBarItem HorizontalAlignment="Right">
+                <TextBlock Text="{Binding CurrentImageSize}"/>
+            </StatusBarItem>
+        </StatusBar>
+    </Grid>
+</Window>
