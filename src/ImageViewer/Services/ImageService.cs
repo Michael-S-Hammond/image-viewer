@@ -20,8 +20,7 @@ public class ImageService
         try
         {
             var files = Directory.GetFiles(folderPath)
-                .Where(file => SupportedExtensions.Contains(Path.GetExtension(file).ToLowerInvariant()))
-                .OrderBy(file => Path.GetFileName(file));
+                .Where(file => SupportedExtensions.Contains(Path.GetExtension(file).ToLowerInvariant()));
 
             foreach (var file in files)
             {

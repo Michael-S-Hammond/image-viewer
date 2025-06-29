@@ -16,6 +16,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     private Uri? _currentVideoSource;
     private string _currentFolderPath = string.Empty;
     private bool _isLoopEnabled = true;
+    private SortOption _currentSortOption = SortOption.Name;
 
     public ImageViewerViewModel()
     {
@@ -103,6 +104,20 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         }
     }
 
+    public SortOption CurrentSortOption
+    {
+        get => _currentSortOption;
+        set
+        {
+            if (_currentSortOption != value)
+            {
+                _currentSortOption = value;
+                OnPropertyChanged();
+                ApplySorting();
+            }
+        }
+    }
+
     public void LoadImagesFromFolder(string folderPath)
     {
         try
@@ -112,6 +127,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
             
             if (_images.Count > 0)
             {
+                _images = SortImages(_images, _currentSortOption);
                 _currentImageIndex = 0;
                 LoadCurrentImage();
             }
@@ -150,6 +166,48 @@ public class ImageViewerViewModel : INotifyPropertyChanged
             LoadCurrentImage();
             UpdateNavigationProperties();
         }
+    }
+
+    private void ApplySorting()
+    {
+        if (_images.Count == 0) return;
+
+        var currentFileName = _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+            ? _images[_currentImageIndex].FileName 
+            : string.Empty;
+
+        _images = SortImages(_images, _currentSortOption);
+
+        if (!string.IsNullOrEmpty(currentFileName))
+        {
+            var newIndex = _images.FindIndex(img => img.FileName == currentFileName);
+            if (newIndex >= 0)
+            {
+                _currentImageIndex = newIndex;
+            }
+            else
+            {
+                _currentImageIndex = 0;
+            }
+        }
+        else
+        {
+            _currentImageIndex = 0;
+        }
+
+        LoadCurrentImage();
+        UpdateNavigationProperties();
+    }
+
+    private List<ImageInfo> SortImages(List<ImageInfo> images, SortOption sortOption)
+    {
+        return sortOption switch
+        {
+            SortOption.Name => images.OrderBy(x => x.FileName, StringComparer.OrdinalIgnoreCase).ToList(),
+            SortOption.Date => images.OrderBy(x => x.DateModified).ToList(),
+            SortOption.Random => images.OrderBy(x => Guid.NewGuid()).ToList(),
+            _ => images
+        };
     }
 
     private void LoadCurrentImage()
