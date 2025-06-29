@@ -40,9 +40,9 @@
             <Button Name="BtnPrevious" Content="← Previous" Click="BtnPrevious_Click" 
                     IsEnabled="{Binding CanNavigatePrevious}"/>
             <TextBlock VerticalAlignment="Center" Margin="10,0">
-                <Run Text="{Binding CurrentImageIndex}"/>
+                <Run Text="{Binding CurrentImageIndex, Mode=OneWay}"/>
                 <Run Text=" of "/>
-                <Run Text="{Binding TotalImages}"/>
+                <Run Text="{Binding TotalImages, Mode=OneWay}"/>
             </TextBlock>
             <Button Name="BtnNext" Content="Next →" Click="BtnNext_Click" 
                     IsEnabled="{Binding CanNavigateNext}"/>
