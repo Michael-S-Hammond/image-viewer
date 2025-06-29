@@ -82,14 +82,6 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     public bool CanNavigatePrevious => _currentImageIndex > 0;
     public bool CanNavigateNext => _currentImageIndex < _images.Count - 1;
 
-    public string CurrentImageName => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
-        ? _images[_currentImageIndex].FileName 
-        : string.Empty;
-
-    public string CurrentImageSize => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
-        ? _images[_currentImageIndex].FileSize 
-        : string.Empty;
-
     public string WindowTitle => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
         ? $"Image Viewer - {_images[_currentImageIndex].FileName}" 
         : "Image Viewer";
@@ -261,8 +253,6 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(TotalImages));
         OnPropertyChanged(nameof(CanNavigatePrevious));
         OnPropertyChanged(nameof(CanNavigateNext));
-        OnPropertyChanged(nameof(CurrentImageName));
-        OnPropertyChanged(nameof(CurrentImageSize));
         OnPropertyChanged(nameof(IsAnimatedGif));
         OnPropertyChanged(nameof(IsVideo));
         OnPropertyChanged(nameof(IsStaticImage));

@@ -10,7 +10,6 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
         <!-- Top Menu Bar -->
@@ -85,15 +84,5 @@
                 <Button Name="BtnStop" Content="⏹ Stop" Click="BtnStop_Click" Margin="5,0"/>
             </StackPanel>
         </StackPanel>
-        
-        <!-- Status Bar -->
-        <StatusBar Grid.Row="3">
-            <StatusBarItem>
-                <TextBlock Text="{Binding CurrentImageName}"/>
-            </StatusBarItem>
-            <StatusBarItem HorizontalAlignment="Right">
-                <TextBlock Text="{Binding CurrentImageSize}"/>
-            </StatusBarItem>
-        </StatusBar>
     </Grid>
 </Window>
