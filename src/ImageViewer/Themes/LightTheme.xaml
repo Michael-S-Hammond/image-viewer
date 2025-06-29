@@ -270,7 +270,7 @@
                                             RecognizesAccessKey="True"/>
                         </Border>
                         <Popup Name="Popup"
-                               Placement="Bottom"
+                               Placement="Right"
                                IsOpen="{TemplateBinding IsSubmenuOpen}"
                                AllowsTransparency="True"
                                Focusable="False"
@@ -291,6 +291,12 @@
                         </Trigger>
                         <Trigger Property="HasItems" Value="False">
                             <Setter TargetName="Popup" Property="Visibility" Value="Collapsed"/>
+                        </Trigger>
+                        <Trigger Property="HasItems" Value="True">
+                            <Setter TargetName="Popup" Property="Placement" Value="Right"/>
+                        </Trigger>
+                        <Trigger Property="Role" Value="TopLevelHeader">
+                            <Setter TargetName="Popup" Property="Placement" Value="Bottom"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
