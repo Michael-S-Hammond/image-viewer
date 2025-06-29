@@ -17,6 +17,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     private string _currentFolderPath = string.Empty;
     private bool _isLoopEnabled = true;
     private SortOption _currentSortOption = SortOption.Name;
+    private ThemeOption _currentTheme = ThemeOption.Dark;
 
     public ImageViewerViewModel()
     {
@@ -106,6 +107,20 @@ public class ImageViewerViewModel : INotifyPropertyChanged
                 _currentSortOption = value;
                 OnPropertyChanged();
                 ApplySorting();
+            }
+        }
+    }
+
+    public ThemeOption CurrentTheme
+    {
+        get => _currentTheme;
+        set
+        {
+            if (_currentTheme != value)
+            {
+                _currentTheme = value;
+                OnPropertyChanged();
+                ApplyTheme();
             }
         }
     }
@@ -200,6 +215,30 @@ public class ImageViewerViewModel : INotifyPropertyChanged
             SortOption.Random => images.OrderBy(x => Guid.NewGuid()).ToList(),
             _ => images
         };
+    }
+
+    private void ApplyTheme()
+    {
+        var app = System.Windows.Application.Current;
+        if (app == null) return;
+
+        var themeUri = _currentTheme switch
+        {
+            ThemeOption.Dark => new Uri("pack://application:,,,/Themes/DarkTheme.xaml"),
+            ThemeOption.Light => new Uri("pack://application:,,,/Themes/LightTheme.xaml"),
+            _ => new Uri("pack://application:,,,/Themes/DarkTheme.xaml")
+        };
+
+        var existingTheme = app.Resources.MergedDictionaries
+            .FirstOrDefault(d => d.Source?.OriginalString.Contains("Theme") == true);
+
+        if (existingTheme != null)
+        {
+            app.Resources.MergedDictionaries.Remove(existingTheme);
+        }
+
+        var newTheme = new System.Windows.ResourceDictionary { Source = themeUri };
+        app.Resources.MergedDictionaries.Add(newTheme);
     }
 
     private void LoadCurrentImage()

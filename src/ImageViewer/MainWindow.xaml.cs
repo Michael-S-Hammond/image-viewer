@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
+using ImageViewer.Models;
 
 namespace ImageViewer;
 
@@ -113,5 +114,19 @@ public partial class MainWindow : Window
             GifPlayer.Position = TimeSpan.Zero;
             GifPlayer.Play();
         }
+    }
+
+    private void MenuItem_Dark_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTheme = ThemeOption.Dark;
+        MenuDarkTheme.IsChecked = true;
+        MenuLightTheme.IsChecked = false;
+    }
+
+    private void MenuItem_Light_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTheme = ThemeOption.Light;
+        MenuDarkTheme.IsChecked = false;
+        MenuLightTheme.IsChecked = true;
     }
 }

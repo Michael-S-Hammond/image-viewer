@@ -8,12 +8,21 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <!-- Top Menu Bar -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Background="LightGray" Margin="5">
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0">
+            <MenuItem Header="_Theme">
+                <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
+                <MenuItem Name="MenuLightTheme" Header="_Light" Click="MenuItem_Light_Click" IsCheckable="True" IsChecked="False"/>
+            </MenuItem>
+        </Menu>
+        
+        <!-- Top Control Bar -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Style="{StaticResource TopBarStyle}" Margin="5">
             <Button Name="BtnSelectFolder" Content="Select Folder" Click="BtnSelectFolder_Click"/>
             <TextBlock Name="TxtCurrentFolder" VerticalAlignment="Center" Margin="10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"/>
@@ -38,7 +47,7 @@
         </StackPanel>
         
         <!-- Main Image Display Area -->
-        <Border Grid.Row="1" Background="Black" Margin="5">
+        <Border Grid.Row="2" Background="Black" Margin="5">
             <Grid>
                 <Viewbox Stretch="Uniform" Name="ImageViewbox" 
                          Visibility="{Binding IsStaticImage, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -62,7 +71,7 @@
         </Border>
         
         <!-- Bottom Controls -->
-        <StackPanel Grid.Row="2" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
+        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5">
             <!-- Navigation Controls -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
                 <Button Name="BtnPrevious" Content="← Previous" Click="BtnPrevious_Click" 
