@@ -31,6 +31,14 @@
             <ComboBox Name="CmbSortOption" VerticalAlignment="Center" Margin="0,0,10,0" 
                       MinWidth="100" SelectedItem="{Binding CurrentSortOption}"
                       ToolTip="Choose sorting method">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Style.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#484848"/>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#FFFFFF"/>
+                        </Style.Resources>
+                    </Style>
+                </ComboBox.ItemContainerStyle>
                 <ComboBox.Items>
                     <x:Static Member="models:SortOption.Name"/>
                     <x:Static Member="models:SortOption.Date"/>
