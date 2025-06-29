@@ -129,9 +129,16 @@ public partial class MainWindow : Window
         UpdateThemeMenuChecks();
     }
 
+    private void MenuItem_Energy_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTheme = ThemeOption.Energy;
+        UpdateThemeMenuChecks();
+    }
+
     private void UpdateThemeMenuChecks()
     {
         MenuDarkTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Dark;
         MenuLightTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Light;
+        MenuEnergyTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Energy;
     }
 }

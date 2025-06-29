@@ -3,5 +3,6 @@ namespace ImageViewer.Models;
 public enum ThemeOption
 {
     Dark,
-    Light
+    Light,
+    Energy
 }

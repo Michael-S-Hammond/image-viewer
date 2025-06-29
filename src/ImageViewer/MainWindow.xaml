@@ -19,6 +19,7 @@
             <MenuItem Header="_Theme">
                 <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
                 <MenuItem Name="MenuLightTheme" Header="_Light" Click="MenuItem_Light_Click" IsCheckable="True" IsChecked="False"/>
+                <MenuItem Name="MenuEnergyTheme" Header="_Energy" Click="MenuItem_Energy_Click" IsCheckable="True" IsChecked="False"/>
             </MenuItem>
         </Menu>
         

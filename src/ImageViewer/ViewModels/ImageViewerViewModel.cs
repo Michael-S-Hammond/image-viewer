@@ -227,6 +227,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         {
             ThemeOption.Dark => new Uri("/Themes/DarkTheme.xaml", UriKind.Relative),
             ThemeOption.Light => new Uri("/Themes/LightTheme.xaml", UriKind.Relative),
+            ThemeOption.Energy => new Uri("/Themes/EnergyTheme.xaml", UriKind.Relative),
             _ => new Uri("/Themes/DarkTheme.xaml", UriKind.Relative)
         };
 
