@@ -56,6 +56,44 @@ public partial class MainWindow : Window
             case Key.Right:
                 _viewModel.NavigateNext();
                 break;
+            case Key.Space:
+                if (_viewModel.IsVideo)
+                {
+                    ToggleVideoPlayback();
+                }
+                break;
         }
+    }
+
+    private void BtnPlay_Click(object sender, RoutedEventArgs e)
+    {
+        VideoPlayer.Play();
+    }
+
+    private void BtnPause_Click(object sender, RoutedEventArgs e)
+    {
+        VideoPlayer.Pause();
+    }
+
+    private void BtnStop_Click(object sender, RoutedEventArgs e)
+    {
+        VideoPlayer.Stop();
+    }
+
+    private void ToggleVideoPlayback()
+    {
+        if (VideoPlayer.CanPause)
+        {
+            VideoPlayer.Pause();
+        }
+        else
+        {
+            VideoPlayer.Play();
+        }
+    }
+
+    private void VideoPlayer_MediaOpened(object sender, RoutedEventArgs e)
+    {
+        VideoPlayer.Play();
     }
 }

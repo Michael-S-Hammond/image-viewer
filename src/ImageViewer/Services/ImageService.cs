@@ -7,7 +7,7 @@ public class ImageService
 {
     private static readonly string[] SupportedExtensions = 
     {
-        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".tif"
+        ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".tiff", ".tif", ".mp4"
     };
 
     public List<ImageInfo> LoadImagesFromFolder(string folderPath)

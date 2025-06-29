@@ -13,6 +13,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     private int _currentImageIndex = -1;
     private BitmapImage? _currentImageSource;
     private Uri? _currentGifSource;
+    private Uri? _currentVideoSource;
     private string _currentFolderPath = string.Empty;
 
     public ImageViewerViewModel()
@@ -40,10 +41,23 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         }
     }
 
+    public Uri? CurrentVideoSource
+    {
+        get => _currentVideoSource;
+        private set
+        {
+            _currentVideoSource = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool IsAnimatedGif => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
         && _images[_currentImageIndex].Extension.Equals(".gif", StringComparison.OrdinalIgnoreCase);
 
-    public bool IsStaticImage => !IsAnimatedGif;
+    public bool IsVideo => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+        && _images[_currentImageIndex].Extension.Equals(".mp4", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsStaticImage => !IsAnimatedGif && !IsVideo;
 
     public string CurrentFolderPath
     {
@@ -94,6 +108,8 @@ public class ImageViewerViewModel : INotifyPropertyChanged
             {
                 _currentImageIndex = -1;
                 CurrentImageSource = null;
+                CurrentGifSource = null;
+                CurrentVideoSource = null;
             }
 
             UpdateNavigationProperties();
@@ -137,6 +153,13 @@ public class ImageViewerViewModel : INotifyPropertyChanged
                 {
                     CurrentGifSource = new Uri(currentImage.FilePath);
                     CurrentImageSource = null;
+                    CurrentVideoSource = null;
+                }
+                else if (currentImage.Extension.Equals(".mp4", StringComparison.OrdinalIgnoreCase))
+                {
+                    CurrentVideoSource = new Uri(currentImage.FilePath);
+                    CurrentImageSource = null;
+                    CurrentGifSource = null;
                 }
                 else
                 {
@@ -149,14 +172,16 @@ public class ImageViewerViewModel : INotifyPropertyChanged
                     
                     CurrentImageSource = bitmap;
                     CurrentGifSource = null;
+                    CurrentVideoSource = null;
                 }
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error loading image: {ex.Message}", "Error", 
+                System.Windows.MessageBox.Show($"Error loading media: {ex.Message}", "Error", 
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 CurrentImageSource = null;
                 CurrentGifSource = null;
+                CurrentVideoSource = null;
             }
         }
     }
@@ -170,6 +195,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(CurrentImageName));
         OnPropertyChanged(nameof(CurrentImageSize));
         OnPropertyChanged(nameof(IsAnimatedGif));
+        OnPropertyChanged(nameof(IsVideo));
         OnPropertyChanged(nameof(IsStaticImage));
         OnPropertyChanged(nameof(WindowTitle));
     }
