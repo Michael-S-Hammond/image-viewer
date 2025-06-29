@@ -170,13 +170,14 @@
                                Focusable="False"
                                PopupAnimation="Slide">
                             <Border Name="DropDownBorder"
-                                    Background="{StaticResource ButtonBackgroundBrush}"
+                                    Background="{StaticResource MenuBackgroundBrush}"
                                     BorderBrush="{StaticResource BorderBrush}"
-                                    BorderThickness="1"
+                                    BorderThickness="2"
                                     CornerRadius="3"
                                     MinWidth="{TemplateBinding ActualWidth}"
                                     MaxHeight="{TemplateBinding MaxDropDownHeight}">
-                                <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                <ScrollViewer Margin="4" SnapsToDevicePixels="True"
+                                            Background="Transparent">
                                     <ItemsPresenter KeyboardNavigation.DirectionalNavigation="Contained"/>
                                 </ScrollViewer>
                             </Border>
@@ -194,20 +195,28 @@
     
     <!-- ComboBoxItem Style -->
     <Style TargetType="ComboBoxItem">
-        <Setter Property="Background" Value="{StaticResource ButtonBackgroundBrush}"/>
+        <Setter Property="Background" Value="Transparent"/>
         <Setter Property="Foreground" Value="{StaticResource ForegroundBrush}"/>
         <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="MinHeight" Value="24"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="ComboBoxItem">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border Name="ItemBorder"
+                            Background="{TemplateBinding Background}"
                             BorderThickness="0"
                             Padding="{TemplateBinding Padding}">
-                        <ContentPresenter/>
+                        <ContentPresenter Name="ContentPresenter"
+                                        TextElement.Foreground="{TemplateBinding Foreground}"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsHighlighted" Value="True">
-                            <Setter Property="Background" Value="{StaticResource ButtonHoverBrush}"/>
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource ButtonHoverBrush}"/>
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{StaticResource ForegroundBrush}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="{StaticResource AccentBrush}"/>
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{StaticResource ForegroundBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -245,6 +254,31 @@
     <!-- StackPanel Style for Top Bar -->
     <Style x:Key="TopBarStyle" TargetType="StackPanel">
         <Setter Property="Background" Value="{StaticResource TopBarBackgroundBrush}"/>
+    </Style>
+    
+    <!-- ToolTip Style -->
+    <Style TargetType="ToolTip">
+        <Setter Property="Background" Value="{StaticResource MenuBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{StaticResource MenuForegroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{StaticResource BorderBrush}"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Padding" Value="8,4"/>
+        <Setter Property="FontFamily" Value="Segoe UI"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToolTip">
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="3"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                        TextElement.Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
     
 </ResourceDictionary>
