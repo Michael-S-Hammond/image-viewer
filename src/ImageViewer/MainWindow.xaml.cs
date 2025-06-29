@@ -113,7 +113,7 @@ public partial class MainWindow : Window
     {
         if (_viewModel.IsLoopEnabled)
         {
-            GifPlayer.Position = TimeSpan.Zero;
+            GifPlayer.Position = TimeSpan.FromMilliseconds(1);
             GifPlayer.Play();
         }
     }
