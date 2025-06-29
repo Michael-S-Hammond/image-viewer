@@ -14,6 +14,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         _viewModel = new ImageViewerViewModel();
         DataContext = _viewModel;
+        UpdateThemeMenuChecks();
     }
 
     private void BtnSelectFolder_Click(object sender, RoutedEventArgs e)
@@ -119,14 +120,18 @@ public partial class MainWindow : Window
     private void MenuItem_Dark_Click(object sender, RoutedEventArgs e)
     {
         _viewModel.CurrentTheme = ThemeOption.Dark;
-        MenuDarkTheme.IsChecked = true;
-        MenuLightTheme.IsChecked = false;
+        UpdateThemeMenuChecks();
     }
 
     private void MenuItem_Light_Click(object sender, RoutedEventArgs e)
     {
         _viewModel.CurrentTheme = ThemeOption.Light;
-        MenuDarkTheme.IsChecked = false;
-        MenuLightTheme.IsChecked = true;
+        UpdateThemeMenuChecks();
+    }
+
+    private void UpdateThemeMenuChecks()
+    {
+        MenuDarkTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Dark;
+        MenuLightTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Light;
     }
 }

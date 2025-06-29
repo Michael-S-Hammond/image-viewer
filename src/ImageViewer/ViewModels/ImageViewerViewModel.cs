@@ -22,6 +22,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     public ImageViewerViewModel()
     {
         _imageService = new ImageService();
+        ApplyTheme(); // Apply default theme on initialization
     }
 
     public BitmapImage? CurrentImageSource
@@ -224,21 +225,31 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
         var themeUri = _currentTheme switch
         {
-            ThemeOption.Dark => new Uri("pack://application:,,,/Themes/DarkTheme.xaml"),
-            ThemeOption.Light => new Uri("pack://application:,,,/Themes/LightTheme.xaml"),
-            _ => new Uri("pack://application:,,,/Themes/DarkTheme.xaml")
+            ThemeOption.Dark => new Uri("/Themes/DarkTheme.xaml", UriKind.Relative),
+            ThemeOption.Light => new Uri("/Themes/LightTheme.xaml", UriKind.Relative),
+            _ => new Uri("/Themes/DarkTheme.xaml", UriKind.Relative)
         };
 
-        var existingTheme = app.Resources.MergedDictionaries
-            .FirstOrDefault(d => d.Source?.OriginalString.Contains("Theme") == true);
+        // Remove existing theme dictionaries
+        var existingThemes = app.Resources.MergedDictionaries
+            .Where(d => d.Source?.OriginalString.Contains("Theme") == true)
+            .ToList();
 
-        if (existingTheme != null)
+        foreach (var theme in existingThemes)
         {
-            app.Resources.MergedDictionaries.Remove(existingTheme);
+            app.Resources.MergedDictionaries.Remove(theme);
         }
 
-        var newTheme = new System.Windows.ResourceDictionary { Source = themeUri };
-        app.Resources.MergedDictionaries.Add(newTheme);
+        try
+        {
+            var newTheme = new System.Windows.ResourceDictionary { Source = themeUri };
+            app.Resources.MergedDictionaries.Add(newTheme);
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error applying theme: {ex.Message}", "Theme Error", 
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+        }
     }
 
     private void LoadCurrentImage()
