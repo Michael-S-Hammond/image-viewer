@@ -159,7 +159,9 @@
                                             IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
                                             ClickMode="Press"
                                             Background="Transparent"
-                                            BorderThickness="0">
+                                            BorderThickness="0"
+                                            HorizontalAlignment="Right"
+                                            Width="20">
                                     <Path Name="Arrow"
                                           HorizontalAlignment="Right"
                                           VerticalAlignment="Center"
