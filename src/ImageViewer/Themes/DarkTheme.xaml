@@ -161,10 +161,11 @@
                                             Background="Transparent"
                                             BorderThickness="0">
                                     <Path Name="Arrow"
-                                          HorizontalAlignment="Center"
+                                          HorizontalAlignment="Right"
                                           VerticalAlignment="Center"
                                           Data="M 0 0 L 4 4 L 8 0 Z"
-                                          Fill="{StaticResource ForegroundBrush}"/>
+                                          Fill="{StaticResource ForegroundBrush}"
+                                          Margin="0,0,4,0"/>
                                 </ToggleButton>
                             </Grid>
                         </Border>
