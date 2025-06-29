@@ -7,7 +7,7 @@
     <SolidColorBrush x:Key="AccentBrush" Color="#E0E0E0"/>
     <SolidColorBrush x:Key="BorderBrush" Color="#CCCCCC"/>
     <SolidColorBrush x:Key="ButtonBackgroundBrush" Color="#F0F0F0"/>
-    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#E0E0E0"/>
+    <SolidColorBrush x:Key="ButtonHoverBrush" Color="#D0D0D0"/>
     <SolidColorBrush x:Key="MenuBackgroundBrush" Color="#F8F8F8"/>
     <SolidColorBrush x:Key="MenuForegroundBrush" Color="#000000"/>
     <SolidColorBrush x:Key="MenuHoverBrush" Color="#E8E8E8"/>
