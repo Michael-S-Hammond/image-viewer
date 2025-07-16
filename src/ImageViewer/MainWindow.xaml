@@ -75,6 +75,9 @@
                 </TextBlock>
                 <Button Name="BtnNext" Content="Next →" Click="BtnNext_Click" 
                         IsEnabled="{Binding CanNavigateNext}"/>
+                <Button Name="BtnReverse" Content="🔄 Reverse" Click="BtnReverse_Click" 
+                        IsEnabled="{Binding HasImages}"
+                        ToolTip="Reverse the order of images"/>
             </StackPanel>
             
             <!-- Video Controls -->
