@@ -85,8 +85,8 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
     public bool HasImages => _images.Count > 0;
 
-    public bool CanNavigatePrevious => _currentImageIndex > 0;
-    public bool CanNavigateNext => _currentImageIndex < _images.Count - 1;
+    public bool CanNavigatePrevious => _images.Count > 0;
+    public bool CanNavigateNext => _images.Count > 0;
 
     public string WindowTitle => _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
         ? $"Image Viewer - {_images[_currentImageIndex].FileName}" 
@@ -162,22 +162,67 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
     public void NavigatePrevious()
     {
-        if (CanNavigatePrevious)
+        if (_images.Count == 0) return;
+        
+        if (_currentImageIndex > 0)
         {
             _currentImageIndex--;
-            LoadCurrentImage();
-            UpdateNavigationProperties();
         }
+        else
+        {
+            _currentImageIndex = _images.Count - 1;
+        }
+        
+        LoadCurrentImage();
+        UpdateNavigationProperties();
     }
 
     public void NavigateNext()
     {
-        if (CanNavigateNext)
+        if (_images.Count == 0) return;
+        
+        if (_currentImageIndex < _images.Count - 1)
         {
             _currentImageIndex++;
-            LoadCurrentImage();
-            UpdateNavigationProperties();
         }
+        else
+        {
+            _currentImageIndex = 0;
+        }
+        
+        LoadCurrentImage();
+        UpdateNavigationProperties();
+    }
+
+    public void ReverseOrder()
+    {
+        if (_images.Count <= 1) return;
+
+        var currentFileName = _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
+            ? _images[_currentImageIndex].FileName 
+            : string.Empty;
+
+        _images.Reverse();
+
+        if (!string.IsNullOrEmpty(currentFileName))
+        {
+            var newIndex = _images.FindIndex(img => img.FileName == currentFileName);
+            if (newIndex >= 0)
+            {
+                _currentImageIndex = newIndex;
+            }
+            else
+            {
+                _currentImageIndex = 0;
+            }
+        }
+        else
+        {
+            _currentImageIndex = 0;
+        }
+
+        LoadCurrentImage();
+        UpdateNavigationProperties();
     }
 
     private void ApplySorting()

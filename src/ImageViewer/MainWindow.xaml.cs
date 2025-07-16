@@ -49,6 +49,11 @@ public partial class MainWindow : Window
         _viewModel.NavigateNext();
     }
 
+    private void BtnReverse_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.ReverseOrder();
+    }
+
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
         // Handle Ctrl key combinations
