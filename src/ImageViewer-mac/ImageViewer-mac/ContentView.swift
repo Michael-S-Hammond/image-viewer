@@ -35,22 +35,30 @@ struct ContentView: View {
                 
                 // Image List
                 if viewModel.hasImages {
-                    List(viewModel.images.indices, id: \.self, selection: Binding(
-                        get: { viewModel.currentImageIndex >= 0 ? viewModel.currentImageIndex : nil },
-                        set: { viewModel.currentImageIndex = $0 ?? 0 }
-                    )) { index in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(viewModel.images[index].fileName)
-                                .font(.headline)
-                                .lineLimit(2)
-                            Text(viewModel.images[index].fileSize)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                    ScrollView {
+                        LazyVStack(spacing: 0) {
+                            ForEach(Array(viewModel.displayedImages.enumerated()), id: \.offset) { displayIndex, imageInfo in
+                                let actualIndex = viewModel.images.firstIndex(where: { $0.id == imageInfo.id }) ?? displayIndex
+                                
+                                ImageListItem(
+                                    imageInfo: imageInfo,
+                                    isSelected: actualIndex == viewModel.currentImageIndex
+                                )
+                                .onTapGesture {
+                                    viewModel.currentImageIndex = actualIndex
+                                }
+                                .onAppear {
+                                    viewModel.loadMoreImagesIfNeeded(currentIndex: displayIndex)
+                                }
+                            }
+                            
+                            if viewModel.isLoadingMore {
+                                ProgressView("Loading more images...")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                            }
                         }
-                        .padding(.vertical, 2)
-                        .tag(index)
                     }
-                    .listStyle(SidebarListStyle())
                 } else {
                     VStack {
                         Spacer()
@@ -176,6 +184,28 @@ struct ContentView: View {
         case .light:
             return .light
         }
+    }
+}
+
+// MARK: - Image List Item
+struct ImageListItem: View {
+    let imageInfo: ImageInfo
+    let isSelected: Bool
+    
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(imageInfo.fileName)
+                .font(.headline)
+                .lineLimit(2)
+            Text(imageInfo.fileSize)
+                .font(.caption)
+                .foregroundColor(.secondary)
+        }
+        .padding(.vertical, 2)
+        .padding(.horizontal, 8)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(isSelected ? Color.accentColor.opacity(0.3) : Color.clear)
+        .cornerRadius(4)
     }
 }
 
