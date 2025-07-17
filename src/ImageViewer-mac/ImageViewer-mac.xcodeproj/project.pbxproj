@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		4C8067C52E286C1900B6EA2C /* ImageViewer-mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ImageViewer-mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4C8067C52E286C1900B6EA2C /* Image Viewer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Image Viewer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C8067D82E286C1A00B6EA2C /* ImageViewer-macTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ImageViewer-macTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4C8067E22E286C1A00B6EA2C /* ImageViewer-macUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "ImageViewer-macUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -85,7 +85,7 @@
 		4C8067C62E286C1900B6EA2C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4C8067C52E286C1900B6EA2C /* ImageViewer-mac.app */,
+				4C8067C52E286C1900B6EA2C /* Image Viewer.app */,
 				4C8067D82E286C1A00B6EA2C /* ImageViewer-macTests.xctest */,
 				4C8067E22E286C1A00B6EA2C /* ImageViewer-macUITests.xctest */,
 			);
@@ -95,9 +95,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4C8067C42E286C1900B6EA2C /* ImageViewer-mac */ = {
+		4C8067C42E286C1900B6EA2C /* Image Viewer */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4C8067EC2E286C1A00B6EA2C /* Build configuration list for PBXNativeTarget "ImageViewer-mac" */;
+			buildConfigurationList = 4C8067EC2E286C1A00B6EA2C /* Build configuration list for PBXNativeTarget "Image Viewer" */;
 			buildPhases = (
 				4C8067C12E286C1900B6EA2C /* Sources */,
 				4C8067C22E286C1900B6EA2C /* Frameworks */,
@@ -110,11 +110,11 @@
 			fileSystemSynchronizedGroups = (
 				4C8067C72E286C1900B6EA2C /* ImageViewer-mac */,
 			);
-			name = "ImageViewer-mac";
+			name = "Image Viewer";
 			packageProductDependencies = (
 			);
 			productName = "ImageViewer-mac";
-			productReference = 4C8067C52E286C1900B6EA2C /* ImageViewer-mac.app */;
+			productReference = 4C8067C52E286C1900B6EA2C /* Image Viewer.app */;
 			productType = "com.apple.product-type.application";
 		};
 		4C8067D72E286C1A00B6EA2C /* ImageViewer-macTests */ = {
@@ -200,7 +200,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4C8067C42E286C1900B6EA2C /* ImageViewer-mac */,
+				4C8067C42E286C1900B6EA2C /* Image Viewer */,
 				4C8067D72E286C1A00B6EA2C /* ImageViewer-macTests */,
 				4C8067E12E286C1A00B6EA2C /* ImageViewer-macUITests */,
 			);
@@ -258,12 +258,12 @@
 /* Begin PBXTargetDependency section */
 		4C8067DA2E286C1A00B6EA2C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4C8067C42E286C1900B6EA2C /* ImageViewer-mac */;
+			target = 4C8067C42E286C1900B6EA2C /* Image Viewer */;
 			targetProxy = 4C8067D92E286C1A00B6EA2C /* PBXContainerItemProxy */;
 		};
 		4C8067E42E286C1A00B6EA2C /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4C8067C42E286C1900B6EA2C /* ImageViewer-mac */;
+			target = 4C8067C42E286C1900B6EA2C /* Image Viewer */;
 			targetProxy = 4C8067E32E286C1A00B6EA2C /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -393,6 +393,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "ImageViewer-mac/ImageViewer_mac.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -406,7 +407,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.torql.ImageViewer.ImageViewer-mac";
+				PRODUCT_BUNDLE_IDENTIFIER = com.torql.ImageViewer.ImageViewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -419,6 +420,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "ImageViewer-mac/ImageViewer_mac.entitlements";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -432,7 +434,7 @@
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "com.torql.ImageViewer.ImageViewer-mac";
+				PRODUCT_BUNDLE_IDENTIFIER = com.torql.ImageViewer.ImageViewer;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -515,7 +517,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4C8067EC2E286C1A00B6EA2C /* Build configuration list for PBXNativeTarget "ImageViewer-mac" */ = {
+		4C8067EC2E286C1A00B6EA2C /* Build configuration list for PBXNativeTarget "Image Viewer" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4C8067ED2E286C1A00B6EA2C /* Debug */,

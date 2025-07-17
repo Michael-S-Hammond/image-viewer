@@ -166,33 +166,7 @@ struct ContentView: View {
             Text(viewModel.errorMessage ?? "An unknown error occurred")
         }
         .preferredColorScheme(colorScheme)
-        .onReceive(NotificationCenter.default.publisher(for: .openFolder)) { _ in
-            viewModel.showingFolderPicker = true
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .navigatePrevious)) { _ in
-            viewModel.navigatePrevious()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .navigateNext)) { _ in
-            viewModel.navigateNext()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .sortByName)) { _ in
-            viewModel.updateSortOption(.name)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .sortByDate)) { _ in
-            viewModel.updateSortOption(.date)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .sortByRandom)) { _ in
-            viewModel.updateSortOption(.random)
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .reverseOrder)) { _ in
-            viewModel.reverseOrder()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .setDarkTheme)) { _ in
-            viewModel.currentTheme = .dark
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .setLightTheme)) { _ in
-            viewModel.currentTheme = .light
-        }
+        .setupNotificationHandlers(viewModel: viewModel)
     }
     
     private var colorScheme: ColorScheme? {
@@ -202,6 +176,40 @@ struct ContentView: View {
         case .light:
             return .light
         }
+    }
+}
+
+// MARK: - Notification Handler Extension
+extension View {
+    func setupNotificationHandlers(viewModel: ImageViewerViewModel) -> some View {
+        self
+            .onReceive(NotificationCenter.default.publisher(for: .openFolder)) { _ in
+                viewModel.showingFolderPicker = true
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .navigatePrevious)) { _ in
+                viewModel.navigatePrevious()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .navigateNext)) { _ in
+                viewModel.navigateNext()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .sortByName)) { _ in
+                viewModel.updateSortOption(.name)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .sortByDate)) { _ in
+                viewModel.updateSortOption(.date)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .sortByRandom)) { _ in
+                viewModel.updateSortOption(.random)
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .reverseOrder)) { _ in
+                viewModel.reverseOrder()
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .setDarkTheme)) { _ in
+                viewModel.currentTheme = .dark
+            }
+            .onReceive(NotificationCenter.default.publisher(for: .setLightTheme)) { _ in
+                viewModel.currentTheme = .light
+            }
     }
 }
 
