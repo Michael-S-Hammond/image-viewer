@@ -1,0 +1,33 @@
+<UserControl x:Class="ImageViewer.Controls.NumericUpDown"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root"
+             MouseWheel="NumericUpDown_MouseWheel">
+    <Border Name="MainBorder" Style="{DynamicResource NumericUpDownBorderStyle}">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBox Name="ValueTextBox"
+                     Grid.Column="0"
+                     Text="{Binding ElementName=Root, Path=Value, UpdateSourceTrigger=PropertyChanged}"
+                     Style="{DynamicResource NumericUpDownTextBoxStyle}"
+                     PreviewTextInput="ValueTextBox_PreviewTextInput"
+                     PreviewKeyDown="ValueTextBox_PreviewKeyDown"
+                     LostFocus="ValueTextBox_LostFocus"/>
+
+            <StackPanel Grid.Column="1" Orientation="Vertical">
+                <Button Name="UpButton"
+                        Content="▲"
+                        Click="UpButton_Click"
+                        Style="{DynamicResource NumericUpDownButtonStyle}"/>
+                <Button Name="DownButton"
+                        Content="▼"
+                        Click="DownButton_Click"
+                        Style="{DynamicResource NumericUpDownButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

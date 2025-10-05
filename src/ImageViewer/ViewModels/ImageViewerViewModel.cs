@@ -1,12 +1,14 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using ImageViewer.Models;
 using ImageViewer.Services;
+using ImageViewer.Helpers;
 
 namespace ImageViewer;
 
-public class ImageViewerViewModel : INotifyPropertyChanged
+public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
 {
     private readonly ImageService _imageService;
     private List<ImageInfo> _images = new();
@@ -18,11 +20,21 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     private bool _isLoopEnabled = true;
     private SortOption _currentSortOption = SortOption.Name;
     private ThemeOption _currentTheme = ThemeOption.Dark;
+    private bool _isSlideShowRunning = false;
+    private int _slideShowSeconds = 10;
+    private int _slideShowLoopCount = 1;
+    private DispatcherTimer? _slideShowTimer;
+    private int _currentMediaLoopCount = 0;
+    private double _progressValue = 0;
+    private ProgressAnimationHelper? _progressAnimationHelper;
+    private Action<double>? _progressUpdateCallback;
 
     public ImageViewerViewModel()
     {
         _imageService = new ImageService();
         ApplyTheme(); // Apply default theme on initialization
+        InitializeSlideShowTimer();
+        InitializeProgressAnimation();
     }
 
     public BitmapImage? CurrentImageSource
@@ -130,8 +142,105 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         }
     }
 
+    public bool IsSlideShowRunning
+    {
+        get => _isSlideShowRunning;
+        private set
+        {
+            _isSlideShowRunning = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(SlideShowButtonText));
+            OnPropertyChanged(nameof(IsProgressBarVisible));
+        }
+    }
+
+    public int SlideShowSeconds
+    {
+        get => _slideShowSeconds;
+        set
+        {
+            if (_slideShowSeconds != value && value > 0)
+            {
+                _slideShowSeconds = value;
+                OnPropertyChanged();
+
+                // Update timer interval if slideshow is running
+                if (_isSlideShowRunning && _slideShowTimer != null)
+                {
+                    _slideShowTimer.Interval = TimeSpan.FromSeconds(_slideShowSeconds);
+
+                    // Restart progress animation for static images with new duration
+                    if (IsStaticImage)
+                    {
+                        StartProgressForCurrentImage();
+                    }
+                }
+            }
+        }
+    }
+
+    public int SlideShowLoopCount
+    {
+        get => _slideShowLoopCount;
+        set
+        {
+            if (_slideShowLoopCount != value && value > 0)
+            {
+                _slideShowLoopCount = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsProgressBarVisible));
+            }
+        }
+    }
+
+    public string SlideShowButtonText => _isSlideShowRunning ? "⏹ Stop Slideshow" : "▶ Start Slideshow";
+
+    public int CurrentMediaLoopCount
+    {
+        get => _currentMediaLoopCount;
+        private set
+        {
+            _currentMediaLoopCount = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public double ProgressValue
+    {
+        get => _progressValue;
+        set
+        {
+            _progressValue = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsProgressBarVisible => _isSlideShowRunning &&
+        (IsStaticImage || (HasLoopableContent && SlideShowLoopCount > 1));
+
+    public void OnMediaEnded()
+    {
+        if (!_isSlideShowRunning) return;
+
+        CurrentMediaLoopCount++;
+
+        // Update progress for looping media
+        if (HasLoopableContent && SlideShowLoopCount > 1)
+        {
+            ProgressValue = (double)CurrentMediaLoopCount / SlideShowLoopCount * 100;
+        }
+
+        // Check if we've completed the required loops for this media
+        if (CurrentMediaLoopCount >= SlideShowLoopCount)
+        {
+            // Move to next image
+            NavigateNext();
+        }
+    }
+
     public void LoadImagesFromFolder(string folderPath)
     {
+        StopSlideShow(); // Stop slideshow when loading new folder
         try
         {
             _images = _imageService.LoadImagesFromFolder(folderPath);
@@ -163,6 +272,8 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     public void NavigatePrevious()
     {
         if (_images.Count == 0) return;
+
+        StopSlideShow(); // Stop slideshow on manual navigation
         
         if (_currentImageIndex > 0)
         {
@@ -179,8 +290,23 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
     public void NavigateNext()
     {
+        NavigateNext(false);
+    }
+
+    public void NavigateNextManual()
+    {
+        NavigateNext(true);
+    }
+
+    private void NavigateNext(bool stopSlideShow)
+    {
         if (_images.Count == 0) return;
-        
+
+        if (stopSlideShow)
+        {
+            StopSlideShow(); // Stop slideshow on manual navigation
+        }
+
         if (_currentImageIndex < _images.Count - 1)
         {
             _currentImageIndex++;
@@ -189,7 +315,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         {
             _currentImageIndex = 0;
         }
-        
+
         LoadCurrentImage();
         UpdateNavigationProperties();
     }
@@ -197,6 +323,8 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     public void ReverseOrder()
     {
         if (_images.Count <= 1) return;
+
+        StopSlideShow(); // Stop slideshow when reversing order
 
         var currentFileName = _currentImageIndex >= 0 && _currentImageIndex < _images.Count 
             ? _images[_currentImageIndex].FileName 
@@ -223,6 +351,89 @@ public class ImageViewerViewModel : INotifyPropertyChanged
 
         LoadCurrentImage();
         UpdateNavigationProperties();
+    }
+
+    public void ToggleSlideShow()
+    {
+        if (_isSlideShowRunning)
+        {
+            StopSlideShow();
+        }
+        else
+        {
+            StartSlideShow();
+        }
+    }
+
+    public void StartSlideShow()
+    {
+        if (_images.Count <= 1 || _slideShowTimer == null || _progressAnimationHelper == null) return;
+
+        IsSlideShowRunning = true;
+        _slideShowTimer.Interval = TimeSpan.FromSeconds(_slideShowSeconds);
+        _slideShowTimer.Start();
+
+        StartProgressForCurrentImage();
+    }
+
+    public void StopSlideShow()
+    {
+        if (_slideShowTimer == null || _progressAnimationHelper == null) return;
+
+        IsSlideShowRunning = false;
+        _slideShowTimer.Stop();
+        _progressAnimationHelper.ResetValue();
+        ProgressValue = 0;
+    }
+
+    private void StartProgressForCurrentImage()
+    {
+        if (_progressAnimationHelper == null) return;
+
+        _progressAnimationHelper.ResetValue();
+        ProgressValue = 0;
+
+        if (IsStaticImage)
+        {
+            // Start smooth animation from 0 to 100 over the slideshow duration
+            var duration = TimeSpan.FromSeconds(_slideShowSeconds);
+            _progressAnimationHelper.StartAnimation(0, 100, duration);
+        }
+        else if (HasLoopableContent && SlideShowLoopCount > 1)
+        {
+            // For looping media, progress is based on completed loops
+            ProgressValue = (double)CurrentMediaLoopCount / SlideShowLoopCount * 100;
+        }
+    }
+
+    private void InitializeSlideShowTimer()
+    {
+        try
+        {
+            _slideShowTimer = new DispatcherTimer();
+            _slideShowTimer.Tick += SlideShowTimer_Tick;
+        }
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show($"Error initializing slideshow timer: {ex.Message}", "Initialization Error",
+                System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+        }
+    }
+
+    private void InitializeProgressAnimation()
+    {
+        _progressAnimationHelper = new ProgressAnimationHelper();
+        _progressUpdateCallback = value => ProgressValue = value;
+        _progressAnimationHelper.SetUpdateCallback(_progressUpdateCallback);
+    }
+
+    private void SlideShowTimer_Tick(object? sender, EventArgs e)
+    {
+        // Only advance for static images - GIFs and videos handle their own timing
+        if (IsStaticImage)
+        {
+            NavigateNext();
+        }
     }
 
     private void ApplySorting()
@@ -309,7 +520,16 @@ public class ImageViewerViewModel : INotifyPropertyChanged
             try
             {
                 var currentImage = _images[_currentImageIndex];
-                
+
+                // Reset loop count when loading new media
+                CurrentMediaLoopCount = 0;
+
+                // Start progress tracking if slideshow is running
+                if (_isSlideShowRunning)
+                {
+                    StartProgressForCurrentImage();
+                }
+
                 if (currentImage.Extension.Equals(".gif", StringComparison.OrdinalIgnoreCase))
                 {
                     CurrentGifSource = new Uri(currentImage.FilePath);
@@ -330,7 +550,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
                     bitmap.CacheOption = BitmapCacheOption.OnLoad;
                     bitmap.EndInit();
                     bitmap.Freeze();
-                    
+
                     CurrentImageSource = bitmap;
                     CurrentGifSource = null;
                     CurrentVideoSource = null;
@@ -338,7 +558,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show($"Error loading media: {ex.Message}", "Error", 
+                System.Windows.MessageBox.Show($"Error loading media: {ex.Message}", "Error",
                     System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
                 CurrentImageSource = null;
                 CurrentGifSource = null;
@@ -359,6 +579,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsStaticImage));
         OnPropertyChanged(nameof(HasLoopableContent));
         OnPropertyChanged(nameof(WindowTitle));
+        OnPropertyChanged(nameof(IsProgressBarVisible));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -366,5 +587,29 @@ public class ImageViewerViewModel : INotifyPropertyChanged
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private bool _disposed = false;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposed)
+        {
+            if (disposing)
+            {
+                _slideShowTimer?.Stop();
+                _slideShowTimer = null;
+                _progressAnimationHelper?.StopAnimation();
+                _progressAnimationHelper = null;
+            }
+
+            _disposed = true;
+        }
     }
 }
