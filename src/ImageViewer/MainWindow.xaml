@@ -3,8 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:models="clr-namespace:ImageViewer.Models"
         xmlns:local="clr-namespace:ImageViewer"
+        xmlns:controls="clr-namespace:ImageViewer.Controls"
         Title="{Binding WindowTitle}" Height="600" Width="800"
         KeyDown="Window_KeyDown"
+        PreviewKeyDown="Window_PreviewKeyDown"
+        Focusable="True"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource BackgroundBrush}">
     <Grid Background="{DynamicResource BackgroundBrush}">
@@ -65,7 +68,8 @@
         <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5" 
                     Style="{DynamicResource BottomControlsStyle}">
             <!-- Navigation Controls -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5"
+                        Visibility="{Binding HasImages, Converter={StaticResource BooleanToVisibilityConverter}}">
                 <Button Name="BtnPrevious" Content="← Previous" Click="BtnPrevious_Click" 
                         IsEnabled="{Binding CanNavigatePrevious}"/>
                 <TextBlock VerticalAlignment="Center" Margin="10,0">
@@ -93,7 +97,32 @@
                           IsChecked="{Binding IsLoopEnabled}" 
                           ToolTip="Loop animated content"/>
             </StackPanel>
-            
+
+            <!-- Slideshow Controls -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5,0,0"
+                        Visibility="{Binding HasImages, Converter={StaticResource BooleanToVisibilityConverter}}">
+                <Button Name="BtnSlideShow" Content="{Binding SlideShowButtonText}" Click="BtnSlideShow_Click"
+                        Margin="5,0" IsEnabled="{Binding HasImages}"/>
+                <TextBlock VerticalAlignment="Center" Margin="10,0,5,0" Text="Seconds per image:"/>
+                <controls:NumericUpDown x:Name="NumSlideShowSeconds"
+                                      Value="{Binding SlideShowSeconds, UpdateSourceTrigger=PropertyChanged}"
+                                      Minimum="1" Maximum="300" Increment="1"
+                                      Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock VerticalAlignment="Center" Margin="10,0,5,0" Text="Loop count:"/>
+                <controls:NumericUpDown x:Name="NumSlideShowLoopCount"
+                                      Value="{Binding SlideShowLoopCount, UpdateSourceTrigger=PropertyChanged}"
+                                      Minimum="1" Maximum="99" Increment="1"
+                                      Margin="0,0,0,0" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <!-- Slideshow Progress Bar -->
+            <ProgressBar Name="SlideShowProgressBar"
+                         Visibility="{Binding IsProgressBarVisible, Converter={StaticResource BooleanToHiddenConverter}}"
+                         Value="{Binding ProgressValue, Mode=OneWay}"
+                         Minimum="0" Maximum="100"
+                         Height="10" Margin="20,5,20,0"
+                         HorizontalAlignment="Stretch"/>
+
             <!-- Current Folder Display -->
             <TextBlock Name="TxtCurrentFolder" HorizontalAlignment="Center" Margin="10,5,10,0" 
                        Text="{Binding CurrentFolderPath}" FontWeight="Bold"

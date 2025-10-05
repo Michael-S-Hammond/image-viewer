@@ -16,6 +16,9 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
         UpdateThemeMenuChecks();
         UpdateSortMenuChecks();
+
+        // Ensure window can receive keyboard focus
+        Loaded += (s, e) => EnsureWindowFocus();
     }
 
     private void MenuItem_OpenFolder_Click(object sender, RoutedEventArgs e)
@@ -42,16 +45,23 @@ public partial class MainWindow : Window
     private void BtnPrevious_Click(object sender, RoutedEventArgs e)
     {
         _viewModel.NavigatePrevious();
+        EnsureWindowFocus();
     }
 
     private void BtnNext_Click(object sender, RoutedEventArgs e)
     {
-        _viewModel.NavigateNext();
+        _viewModel.NavigateNextManual();
+        EnsureWindowFocus();
     }
 
     private void BtnReverse_Click(object sender, RoutedEventArgs e)
     {
         _viewModel.ReverseOrder();
+    }
+
+    private void BtnSlideShow_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.ToggleSlideShow();
     }
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -92,9 +102,13 @@ public partial class MainWindow : Window
             {
                 case Key.Left:
                     _viewModel.NavigatePrevious();
+                    EnsureWindowFocus();
+                    e.Handled = true;
                     break;
                 case Key.Right:
-                    _viewModel.NavigateNext();
+                    _viewModel.NavigateNextManual();
+                    EnsureWindowFocus();
+                    e.Handled = true;
                     break;
                 case Key.Space:
                     if (_viewModel.IsVideo)
@@ -140,19 +154,47 @@ public partial class MainWindow : Window
 
     private void VideoPlayer_MediaEnded(object sender, RoutedEventArgs e)
     {
-        if (_viewModel.IsLoopEnabled)
+        HandleMediaEnded(() =>
         {
             VideoPlayer.Position = TimeSpan.Zero;
             VideoPlayer.Play();
-        }
+        });
     }
 
     private void GifPlayer_MediaEnded(object sender, RoutedEventArgs e)
     {
-        if (_viewModel.IsLoopEnabled)
+        HandleMediaEnded(() =>
         {
             GifPlayer.Position = TimeSpan.FromMilliseconds(1);
             GifPlayer.Play();
+        });
+    }
+
+    private void HandleMediaEnded(Action restartMedia)
+    {
+        if (_viewModel.IsLoopEnabled)
+        {
+            // If slideshow is running, let ViewModel handle loop counting
+            if (_viewModel.IsSlideShowRunning)
+            {
+                _viewModel.OnMediaEnded();
+
+                // Only restart if we haven't reached the required loops
+                if (_viewModel.CurrentMediaLoopCount < _viewModel.SlideShowLoopCount)
+                {
+                    restartMedia();
+                }
+            }
+            else
+            {
+                // Normal loop behavior when slideshow is not running
+                restartMedia();
+            }
+        }
+        else if (_viewModel.IsSlideShowRunning)
+        {
+            // If looping is disabled but slideshow is running, advance immediately
+            _viewModel.OnMediaEnded();
         }
     }
 
@@ -209,5 +251,24 @@ public partial class MainWindow : Window
         MenuSortName.IsChecked = _viewModel.CurrentSortOption == SortOption.Name;
         MenuSortDate.IsChecked = _viewModel.CurrentSortOption == SortOption.Date;
         MenuSortRandom.IsChecked = _viewModel.CurrentSortOption == SortOption.Random;
+    }
+
+    private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        // Handle navigation keys at the preview level to ensure they're always captured
+        if (e.Key == Key.Left || e.Key == Key.Right)
+        {
+            // Let the main KeyDown handler process these
+            return;
+        }
+    }
+
+    private void EnsureWindowFocus()
+    {
+        // Ensure the window has keyboard focus for navigation
+        if (!IsKeyboardFocusWithin)
+        {
+            Focus();
+        }
     }
 }
