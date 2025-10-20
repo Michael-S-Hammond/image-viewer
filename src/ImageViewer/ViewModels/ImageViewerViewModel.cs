@@ -233,7 +233,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
         // Check if we've completed the required loops for this media
         if (CurrentMediaLoopCount >= SlideShowLoopCount)
         {
-            // Move to next image
+            // Move to next image - timer will restart in StartProgressForCurrentImage
             NavigateNext();
         }
     }
@@ -398,11 +398,31 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
             // Start smooth animation from 0 to 100 over the slideshow duration
             var duration = TimeSpan.FromSeconds(_slideShowSeconds);
             _progressAnimationHelper.StartAnimation(0, 100, duration);
+
+            // Resume timer for static images
+            if (_slideShowTimer != null && _isSlideShowRunning)
+            {
+                _slideShowTimer.Start();
+            }
         }
         else if (HasLoopableContent && SlideShowLoopCount > 1)
         {
             // For looping media, progress is based on completed loops
             ProgressValue = (double)CurrentMediaLoopCount / SlideShowLoopCount * 100;
+
+            // Pause timer while media is playing - it will advance via OnMediaEnded
+            if (_slideShowTimer != null)
+            {
+                _slideShowTimer.Stop();
+            }
+        }
+        else
+        {
+            // For single-loop media, pause timer while media is playing
+            if (_slideShowTimer != null)
+            {
+                _slideShowTimer.Stop();
+            }
         }
     }
 
