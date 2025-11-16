@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using ImageViewer.Models;
@@ -28,6 +29,10 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
     private double _progressValue = 0;
     private ProgressAnimationHelper? _progressAnimationHelper;
     private Action<double>? _progressUpdateCallback;
+    private double _zoomLevel = 1.0;
+    private double _panX = 0;
+    private double _panY = 0;
+    private Stretch _stretchMode = Stretch.Uniform;
 
     public ImageViewerViewModel()
     {
@@ -217,6 +222,99 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
 
     public bool IsProgressBarVisible => _isSlideShowRunning &&
         (IsStaticImage || (HasLoopableContent && SlideShowLoopCount > 1));
+
+    public double ZoomLevel
+    {
+        get => _zoomLevel;
+        set
+        {
+            if (_zoomLevel != value && value >= 0.1 && value <= 10.0)
+            {
+                _zoomLevel = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsZoomed));
+            }
+        }
+    }
+
+    public double PanX
+    {
+        get => _panX;
+        set
+        {
+            _panX = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public double PanY
+    {
+        get => _panY;
+        set
+        {
+            _panY = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public bool IsZoomed => _zoomLevel > 1.0;
+
+    public Stretch StretchMode
+    {
+        get => _stretchMode;
+        set
+        {
+            if (_stretchMode != value)
+            {
+                _stretchMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public void ToggleZoomToFill()
+    {
+        if (_zoomLevel > 1.0)
+        {
+            // If zoomed in, reset to fit
+            ResetZoom();
+        }
+        else
+        {
+            // Calculate zoom level needed to fill the window
+            // This will be implemented in the code-behind where we have access to window dimensions
+            // For now, just zoom to a reasonable fill level
+            ZoomLevel = 1.5;
+            PanX = 0;
+            PanY = 0;
+        }
+    }
+
+    public void ZoomIn()
+    {
+        ZoomLevel = Math.Min(10.0, _zoomLevel * 1.2);
+    }
+
+    public void ZoomOut()
+    {
+        ZoomLevel = Math.Max(0.1, _zoomLevel / 1.2);
+    }
+
+    public void ResetZoom()
+    {
+        ZoomLevel = 1.0;
+        PanX = 0;
+        PanY = 0;
+    }
+
+    public void Pan(double deltaX, double deltaY)
+    {
+        if (_zoomLevel > 1.0)
+        {
+            PanX += deltaX;
+            PanY += deltaY;
+        }
+    }
 
     public void OnMediaEnded()
     {
@@ -543,6 +641,9 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
 
                 // Reset loop count when loading new media
                 CurrentMediaLoopCount = 0;
+
+                // Reset zoom and pan when changing images
+                ResetZoom();
 
                 // Start progress tracking if slideshow is running
                 if (_isSlideShowRunning)

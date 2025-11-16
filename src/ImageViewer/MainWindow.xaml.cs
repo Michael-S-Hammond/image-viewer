@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using ImageViewer.Models;
 
@@ -8,6 +9,8 @@ namespace ImageViewer;
 public partial class MainWindow : Window
 {
     private readonly ImageViewerViewModel _viewModel;
+    private bool _isDragging = false;
+    private Point _lastMousePosition;
 
     public MainWindow()
     {
@@ -95,19 +98,64 @@ public partial class MainWindow : Window
             MenuItem_Exit_Click(this, new RoutedEventArgs());
             e.Handled = true;
         }
-        // Handle existing navigation keys
+        // Handle existing navigation keys and zoom/pan
         else
         {
             switch (e.Key)
             {
                 case Key.Left:
-                    _viewModel.NavigatePrevious();
-                    EnsureWindowFocus();
-                    e.Handled = true;
+                    if (_viewModel.IsZoomed)
+                    {
+                        _viewModel.Pan(50, 0);
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        _viewModel.NavigatePrevious();
+                        EnsureWindowFocus();
+                        e.Handled = true;
+                    }
                     break;
                 case Key.Right:
-                    _viewModel.NavigateNextManual();
-                    EnsureWindowFocus();
+                    if (_viewModel.IsZoomed)
+                    {
+                        _viewModel.Pan(-50, 0);
+                        e.Handled = true;
+                    }
+                    else
+                    {
+                        _viewModel.NavigateNextManual();
+                        EnsureWindowFocus();
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Up:
+                    if (_viewModel.IsZoomed)
+                    {
+                        _viewModel.Pan(0, 50);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Down:
+                    if (_viewModel.IsZoomed)
+                    {
+                        _viewModel.Pan(0, -50);
+                        e.Handled = true;
+                    }
+                    break;
+                case Key.Add:
+                case Key.OemPlus:
+                    _viewModel.ZoomIn();
+                    e.Handled = true;
+                    break;
+                case Key.Subtract:
+                case Key.OemMinus:
+                    _viewModel.ZoomOut();
+                    e.Handled = true;
+                    break;
+                case Key.D0:
+                case Key.NumPad0:
+                    _viewModel.ResetZoom();
                     e.Handled = true;
                     break;
                 case Key.Space:
@@ -269,6 +317,127 @@ public partial class MainWindow : Window
         if (!IsKeyboardFocusWithin)
         {
             Focus();
+        }
+    }
+
+    private void ImageBorder_MouseWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (e.Delta > 0)
+        {
+            _viewModel.ZoomIn();
+        }
+        else
+        {
+            _viewModel.ZoomOut();
+        }
+        e.Handled = true;
+    }
+
+    private void ImageBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 2)
+        {
+            // Double-click detected - toggle zoom to fill
+            _viewModel.ResetZoom();
+            e.Handled = true;
+        }
+        else if (_viewModel.IsZoomed)
+        {
+            // Single click while zoomed - start dragging
+            _isDragging = true;
+            _lastMousePosition = e.GetPosition(ImageBorder);
+            ImageBorder.CaptureMouse();
+            ImageBorder.Cursor = Cursors.Hand;
+            e.Handled = true;
+        }
+    }
+
+    private void ZoomToFillWindow()
+    {
+        if (_viewModel.IsStaticImage && MainImage.Source is BitmapSource bitmapSource)
+        {
+            double imageWidth = bitmapSource.PixelWidth;
+            double imageHeight = bitmapSource.PixelHeight;
+            double windowWidth = ImageBorder.ActualWidth;
+            double windowHeight = ImageBorder.ActualHeight;
+
+            if (imageWidth > 0 && imageHeight > 0 && windowWidth > 0 && windowHeight > 0)
+            {
+                // Calculate what the Viewbox's current scale is (Uniform fit)
+                double viewboxFitScale = Math.Min(windowWidth / imageWidth, windowHeight / imageHeight);
+
+                // Calculate the scale needed to fill (instead of fit)
+                double viewboxFillScale = Math.Max(windowWidth / imageWidth, windowHeight / imageHeight);
+
+                // The additional zoom we need is the ratio between fill and fit
+                double additionalZoom = viewboxFillScale / viewboxFitScale;
+
+                _viewModel.ZoomLevel = Math.Min(10.0, additionalZoom);
+                _viewModel.PanX = 0;
+                _viewModel.PanY = 0;
+            }
+        }
+        else if (_viewModel.IsAnimatedGif && GifPlayer.NaturalVideoWidth > 0)
+        {
+            double videoWidth = GifPlayer.NaturalVideoWidth;
+            double videoHeight = GifPlayer.NaturalVideoHeight;
+            double windowWidth = ImageBorder.ActualWidth;
+            double windowHeight = ImageBorder.ActualHeight;
+
+            if (videoWidth > 0 && videoHeight > 0 && windowWidth > 0 && windowHeight > 0)
+            {
+                double viewboxFitScale = Math.Min(windowWidth / videoWidth, windowHeight / videoHeight);
+                double viewboxFillScale = Math.Max(windowWidth / videoWidth, windowHeight / videoHeight);
+                double additionalZoom = viewboxFillScale / viewboxFitScale;
+
+                _viewModel.ZoomLevel = Math.Min(10.0, additionalZoom);
+                _viewModel.PanX = 0;
+                _viewModel.PanY = 0;
+            }
+        }
+        else if (_viewModel.IsVideo && VideoPlayer.NaturalVideoWidth > 0)
+        {
+            double videoWidth = VideoPlayer.NaturalVideoWidth;
+            double videoHeight = VideoPlayer.NaturalVideoHeight;
+            double windowWidth = ImageBorder.ActualWidth;
+            double windowHeight = ImageBorder.ActualHeight;
+
+            if (videoWidth > 0 && videoHeight > 0 && windowWidth > 0 && windowHeight > 0)
+            {
+                double viewboxFitScale = Math.Min(windowWidth / videoWidth, windowHeight / videoHeight);
+                double viewboxFillScale = Math.Max(windowWidth / videoWidth, windowHeight / videoHeight);
+                double additionalZoom = viewboxFillScale / viewboxFitScale;
+
+                _viewModel.ZoomLevel = Math.Min(10.0, additionalZoom);
+                _viewModel.PanX = 0;
+                _viewModel.PanY = 0;
+            }
+        }
+    }
+
+    private void ImageBorder_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_isDragging)
+        {
+            _isDragging = false;
+            ImageBorder.ReleaseMouseCapture();
+            ImageBorder.Cursor = Cursors.Arrow;
+            e.Handled = true;
+        }
+    }
+
+    private void ImageBorder_MouseMove(object sender, MouseEventArgs e)
+    {
+        if (_isDragging && _viewModel.IsZoomed)
+        {
+            Point currentPosition = e.GetPosition(ImageBorder);
+            double deltaX = (currentPosition.X - _lastMousePosition.X) * 2.0;
+            double deltaY = (currentPosition.Y - _lastMousePosition.Y) * 2.0;
+
+            _viewModel.Pan(deltaX, deltaY);
+
+            _lastMousePosition = currentPosition;
+            e.Handled = true;
         }
     }
 }
