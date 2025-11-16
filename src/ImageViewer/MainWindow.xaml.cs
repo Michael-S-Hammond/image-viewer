@@ -11,6 +11,10 @@ public partial class MainWindow : Window
     private readonly ImageViewerViewModel _viewModel;
     private bool _isDragging = false;
     private Point _lastMousePosition;
+    private bool _isFullScreen = false;
+    private WindowStyle _previousWindowStyle;
+    private WindowState _previousWindowState;
+    private ResizeMode _previousResizeMode;
 
     public MainWindow()
     {
@@ -69,6 +73,22 @@ public partial class MainWindow : Window
 
     private void Window_KeyDown(object sender, KeyEventArgs e)
     {
+        // Handle F11 for fullscreen toggle
+        if (e.Key == Key.F11)
+        {
+            ToggleFullScreen();
+            e.Handled = true;
+            return;
+        }
+
+        // Handle Esc to exit fullscreen
+        if (e.Key == Key.Escape && _isFullScreen)
+        {
+            ToggleFullScreen();
+            e.Handled = true;
+            return;
+        }
+
         // Handle Ctrl key combinations
         if (Keyboard.Modifiers == ModifierKeys.Control)
         {
@@ -287,6 +307,11 @@ public partial class MainWindow : Window
         Close();
     }
 
+    private void MenuItem_FullScreen_Click(object sender, RoutedEventArgs e)
+    {
+        ToggleFullScreen();
+    }
+
     private void UpdateThemeMenuChecks()
     {
         MenuDarkTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Dark;
@@ -317,6 +342,40 @@ public partial class MainWindow : Window
         if (!IsKeyboardFocusWithin)
         {
             Focus();
+        }
+    }
+
+    private void ToggleFullScreen()
+    {
+        if (_isFullScreen)
+        {
+            // Exit fullscreen
+            WindowStyle = _previousWindowStyle;
+            WindowState = _previousWindowState;
+            ResizeMode = _previousResizeMode;
+
+            // Show menu and controls
+            Menu.Visibility = Visibility.Visible;
+            BottomControls.Visibility = Visibility.Visible;
+
+            _isFullScreen = false;
+        }
+        else
+        {
+            // Enter fullscreen
+            _previousWindowStyle = WindowStyle;
+            _previousWindowState = WindowState;
+            _previousResizeMode = ResizeMode;
+
+            WindowStyle = WindowStyle.None;
+            WindowState = WindowState.Maximized;
+            ResizeMode = ResizeMode.NoResize;
+
+            // Hide menu and controls
+            Menu.Visibility = Visibility.Collapsed;
+            BottomControls.Visibility = Visibility.Collapsed;
+
+            _isFullScreen = true;
         }
     }
 

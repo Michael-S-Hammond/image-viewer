@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         
         <!-- Menu Bar -->
-        <Menu Grid.Row="0">
+        <Menu Grid.Row="0" Name="Menu">
             <MenuItem Header="_File">
                 <MenuItem Name="MenuOpenFolder" Header="_Open Folder..." Click="MenuItem_OpenFolder_Click" InputGestureText="Ctrl+O"/>
                 <MenuItem Header="_Sort By">
@@ -29,10 +29,14 @@
                 </MenuItem>
                 <MenuItem Name="MenuExit" Header="E_xit" Click="MenuItem_Exit_Click" InputGestureText="Alt+F4"/>
             </MenuItem>
-            <MenuItem Header="_Theme">
-                <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
-                <MenuItem Name="MenuLightTheme" Header="_Light" Click="MenuItem_Light_Click" IsCheckable="True" IsChecked="False"/>
-                <MenuItem Name="MenuEnergyTheme" Header="_Energy" Click="MenuItem_Energy_Click" IsCheckable="True" IsChecked="False"/>
+            <MenuItem Header="_View">
+                <MenuItem Name="MenuFullScreen" Header="_Full Screen" Click="MenuItem_FullScreen_Click" InputGestureText="F11"/>
+                <Separator/>
+                <MenuItem Header="_Theme">
+                    <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
+                    <MenuItem Name="MenuLightTheme" Header="_Light" Click="MenuItem_Light_Click" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Name="MenuEnergyTheme" Header="_Energy" Click="MenuItem_Energy_Click" IsCheckable="True" IsChecked="False"/>
+                </MenuItem>
             </MenuItem>
         </Menu>
         
@@ -98,8 +102,8 @@
         </Border>
         
         <!-- Bottom Controls -->
-        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5" 
-                    Style="{DynamicResource BottomControlsStyle}">
+        <StackPanel Grid.Row="3" Orientation="Vertical" HorizontalAlignment="Center" Margin="5"
+                    Name="BottomControls" Style="{DynamicResource BottomControlsStyle}">
             <!-- Navigation Controls -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,5"
                         Visibility="{Binding HasImages, Converter={StaticResource BooleanToVisibilityConverter}}">
