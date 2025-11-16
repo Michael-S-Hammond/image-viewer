@@ -32,6 +32,13 @@
             <MenuItem Header="_View">
                 <MenuItem Name="MenuFullScreen" Header="_Full Screen" Click="MenuItem_FullScreen_Click" InputGestureText="F11"/>
                 <Separator/>
+                <MenuItem Header="T_ransition">
+                    <MenuItem Name="MenuTransitionNone" Header="_None" Click="MenuItem_TransitionNone_Click" IsCheckable="True" IsChecked="True"/>
+                    <MenuItem Name="MenuTransitionFade" Header="_Fade" Click="MenuItem_TransitionFade_Click" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Name="MenuTransitionSlide" Header="_Slide" Click="MenuItem_TransitionSlide_Click" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Name="MenuTransitionDissolve" Header="_Dissolve" Click="MenuItem_TransitionDissolve_Click" IsCheckable="True" IsChecked="False"/>
+                    <MenuItem Name="MenuTransitionCrossFade" Header="_Cross Fade" Click="MenuItem_TransitionCrossFade_Click" IsCheckable="True" IsChecked="False"/>
+                </MenuItem>
                 <MenuItem Header="_Theme">
                     <MenuItem Name="MenuDarkTheme" Header="_Dark" Click="MenuItem_Dark_Click" IsCheckable="True" IsChecked="True"/>
                     <MenuItem Name="MenuLightTheme" Header="_Light" Click="MenuItem_Light_Click" IsCheckable="True" IsChecked="False"/>
@@ -51,6 +58,21 @@
                 MouseLeftButtonUp="ImageBorder_MouseLeftButtonUp"
                 MouseMove="ImageBorder_MouseMove">
             <Grid Name="ImageDisplayGrid" ClipToBounds="True">
+                <!-- Previous Static Image (for cross fade) -->
+                <Viewbox Stretch="Uniform" Name="PreviousImageViewbox" Visibility="Collapsed">
+                    <Image Name="PreviousImage" RenderOptions.BitmapScalingMode="HighQuality"/>
+                </Viewbox>
+
+                <!-- Previous Animated GIF (for cross fade) -->
+                <Viewbox Stretch="Uniform" Name="PreviousGifViewbox" Visibility="Collapsed">
+                    <MediaElement Name="PreviousGifPlayer" LoadedBehavior="Manual" UnloadedBehavior="Manual"/>
+                </Viewbox>
+
+                <!-- Previous Video (for cross fade) -->
+                <Viewbox Stretch="Uniform" Name="PreviousVideoViewbox" Visibility="Collapsed">
+                    <MediaElement Name="PreviousVideoPlayer" LoadedBehavior="Manual" UnloadedBehavior="Manual"/>
+                </Viewbox>
+
                 <!-- Static Image -->
                 <Viewbox Stretch="Uniform" Name="ImageViewbox"
                          Visibility="{Binding IsStaticImage, Converter={StaticResource BooleanToVisibilityConverter}}">

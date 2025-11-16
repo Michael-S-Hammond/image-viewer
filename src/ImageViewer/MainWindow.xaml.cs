@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Animation;
 using Microsoft.Win32;
 using ImageViewer.Models;
 
@@ -16,6 +17,11 @@ public partial class MainWindow : Window
     private WindowState _previousWindowState;
     private ResizeMode _previousResizeMode;
 
+    // Track last shown content for cross fade
+    private BitmapImage? _lastImageSource;
+    private Uri? _lastGifSource;
+    private Uri? _lastVideoSource;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -23,6 +29,49 @@ public partial class MainWindow : Window
         DataContext = _viewModel;
         UpdateThemeMenuChecks();
         UpdateSortMenuChecks();
+        UpdateTransitionMenuChecks();
+
+        // Listen for property changes to trigger transitions
+        _viewModel.PropertyChanged += (s, e) =>
+        {
+            // Only process when a specific source property is set to non-null (not when cleared)
+            // This ensures we only run once per image change
+            bool shouldProcess = false;
+            if (e.PropertyName == nameof(_viewModel.CurrentImageSource) && _viewModel.CurrentImageSource != null)
+                shouldProcess = true;
+            else if (e.PropertyName == nameof(_viewModel.CurrentGifSource) && _viewModel.CurrentGifSource != null)
+                shouldProcess = true;
+            else if (e.PropertyName == nameof(_viewModel.CurrentVideoSource) && _viewModel.CurrentVideoSource != null)
+                shouldProcess = true;
+
+            if (!shouldProcess)
+                return;
+
+            // For cross fade, immediately set ALL viewboxes to opacity 0 FIRST
+            if (_viewModel.CurrentTransition == TransitionEffect.CrossFade)
+            {
+                ImageViewbox.Opacity = 0.0;
+                GifViewbox.Opacity = 0.0;
+                VideoViewbox.Opacity = 0.0;
+            }
+
+            // Capture current state to previous containers before transition (for cross fade)
+            CapturePreviousState();
+
+            // For cross fade, apply transition synchronously
+            if (_viewModel.CurrentTransition == TransitionEffect.CrossFade)
+            {
+                // Force layout update first
+                ImageDisplayGrid.UpdateLayout();
+                // Apply transition immediately
+                ApplyTransition();
+            }
+            else
+            {
+                // For other transitions, use dispatcher to ensure UI is updated
+                Dispatcher.BeginInvoke(new Action(() => ApplyTransition()), System.Windows.Threading.DispatcherPriority.Loaded);
+            }
+        };
 
         // Ensure window can receive keyboard focus
         Loaded += (s, e) => EnsureWindowFocus();
@@ -312,6 +361,45 @@ public partial class MainWindow : Window
         ToggleFullScreen();
     }
 
+    private void MenuItem_TransitionNone_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTransition = TransitionEffect.None;
+        UpdateTransitionMenuChecks();
+    }
+
+    private void MenuItem_TransitionFade_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTransition = TransitionEffect.Fade;
+        UpdateTransitionMenuChecks();
+    }
+
+    private void MenuItem_TransitionSlide_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTransition = TransitionEffect.Slide;
+        UpdateTransitionMenuChecks();
+    }
+
+    private void MenuItem_TransitionDissolve_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTransition = TransitionEffect.Dissolve;
+        UpdateTransitionMenuChecks();
+    }
+
+    private void MenuItem_TransitionCrossFade_Click(object sender, RoutedEventArgs e)
+    {
+        _viewModel.CurrentTransition = TransitionEffect.CrossFade;
+        UpdateTransitionMenuChecks();
+    }
+
+    private void UpdateTransitionMenuChecks()
+    {
+        MenuTransitionNone.IsChecked = _viewModel.CurrentTransition == TransitionEffect.None;
+        MenuTransitionFade.IsChecked = _viewModel.CurrentTransition == TransitionEffect.Fade;
+        MenuTransitionSlide.IsChecked = _viewModel.CurrentTransition == TransitionEffect.Slide;
+        MenuTransitionDissolve.IsChecked = _viewModel.CurrentTransition == TransitionEffect.Dissolve;
+        MenuTransitionCrossFade.IsChecked = _viewModel.CurrentTransition == TransitionEffect.CrossFade;
+    }
+
     private void UpdateThemeMenuChecks()
     {
         MenuDarkTheme.IsChecked = _viewModel.CurrentTheme == ThemeOption.Dark;
@@ -498,5 +586,193 @@ public partial class MainWindow : Window
             _lastMousePosition = currentPosition;
             e.Handled = true;
         }
+    }
+
+    private void ApplyTransition()
+    {
+        // Determine which element to animate based on content type
+        UIElement? targetElement = null;
+        if (_viewModel.IsStaticImage)
+            targetElement = ImageViewbox;
+        else if (_viewModel.IsAnimatedGif)
+            targetElement = GifViewbox;
+        else if (_viewModel.IsVideo)
+            targetElement = VideoViewbox;
+
+        if (targetElement == null)
+            return;
+
+        // Remove any existing animations
+        targetElement.BeginAnimation(UIElement.OpacityProperty, null);
+        targetElement.RenderTransform = new System.Windows.Media.TranslateTransform();
+        targetElement.RenderTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, null);
+
+        switch (_viewModel.CurrentTransition)
+        {
+            case TransitionEffect.None:
+                // No animation
+                targetElement.Opacity = 1.0;
+                break;
+
+            case TransitionEffect.Fade:
+                {
+                    var fadeAnimation = new DoubleAnimation
+                    {
+                        From = 0.0,
+                        To = 1.0,
+                        Duration = TimeSpan.FromMilliseconds(1000),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    targetElement.BeginAnimation(UIElement.OpacityProperty, fadeAnimation);
+                }
+                break;
+
+            case TransitionEffect.Slide:
+                {
+                    targetElement.Opacity = 1.0;
+                    var slideTransform = new System.Windows.Media.TranslateTransform();
+                    targetElement.RenderTransform = slideTransform;
+
+                    var slideAnimation = new DoubleAnimation
+                    {
+                        From = ImageBorder.ActualWidth,
+                        To = 0.0,
+                        Duration = TimeSpan.FromMilliseconds(750),
+                        EasingFunction = new CubicEase { EasingMode = EasingMode.EaseOut }
+                    };
+                    slideTransform.BeginAnimation(System.Windows.Media.TranslateTransform.XProperty, slideAnimation);
+                }
+                break;
+
+            case TransitionEffect.Dissolve:
+                {
+                    var dissolveAnimation = new DoubleAnimation
+                    {
+                        From = 0.0,
+                        To = 1.0,
+                        Duration = TimeSpan.FromMilliseconds(750),
+                        EasingFunction = new ExponentialEase { EasingMode = EasingMode.EaseInOut, Exponent = 3 }
+                    };
+                    targetElement.BeginAnimation(UIElement.OpacityProperty, dissolveAnimation);
+                }
+                break;
+
+            case TransitionEffect.CrossFade:
+                {
+                    // Determine which previous element to fade out (just check visibility, not content type)
+                    UIElement? previousElement = null;
+                    if (PreviousImageViewbox.Visibility == Visibility.Visible)
+                        previousElement = PreviousImageViewbox;
+                    else if (PreviousGifViewbox.Visibility == Visibility.Visible)
+                        previousElement = PreviousGifViewbox;
+                    else if (PreviousVideoViewbox.Visibility == Visibility.Visible)
+                        previousElement = PreviousVideoViewbox;
+
+                    // Immediately set opacity to 0 to prevent flash
+                    targetElement.Opacity = 0.0;
+
+                    // Fade in the new image
+                    var fadeInAnimation = new DoubleAnimation
+                    {
+                        From = 0.0,
+                        To = 1.0,
+                        Duration = TimeSpan.FromMilliseconds(750),
+                        EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+                    };
+                    targetElement.BeginAnimation(UIElement.OpacityProperty, fadeInAnimation);
+
+                    // Fade out the previous image if it exists
+                    if (previousElement != null)
+                    {
+                        var fadeOutAnimation = new DoubleAnimation
+                        {
+                            From = 1.0,
+                            To = 0.0,
+                            Duration = TimeSpan.FromMilliseconds(750),
+                            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseInOut }
+                        };
+                        fadeOutAnimation.Completed += (s, e) =>
+                        {
+                            // Hide and clear previous elements after animation
+                            HidePreviousElements();
+                        };
+                        previousElement.BeginAnimation(UIElement.OpacityProperty, fadeOutAnimation);
+                    }
+                    else
+                    {
+                        // No previous element, just fade in (first image)
+                        // Clean up will happen on next transition
+                    }
+                }
+                break;
+        }
+    }
+
+    private void CapturePreviousState()
+    {
+        // Only capture if we're using cross fade transition
+        if (_viewModel.CurrentTransition != TransitionEffect.CrossFade)
+        {
+            HidePreviousElements();
+            UpdateLastShownContent();
+            return;
+        }
+
+        // Use the tracked last shown content for cross fade
+        // This is captured BEFORE the new content is bound
+        if (_lastImageSource != null)
+        {
+            PreviousImage.Source = _lastImageSource;
+            PreviousImageViewbox.Visibility = Visibility.Visible;
+            PreviousImageViewbox.Opacity = 1.0;
+            // Hide other previous elements
+            PreviousGifViewbox.Visibility = Visibility.Collapsed;
+            PreviousVideoViewbox.Visibility = Visibility.Collapsed;
+        }
+        else if (_lastGifSource != null)
+        {
+            PreviousGifPlayer.Source = _lastGifSource;
+            PreviousGifViewbox.Visibility = Visibility.Visible;
+            PreviousGifViewbox.Opacity = 1.0;
+            // Hide other previous elements
+            PreviousImageViewbox.Visibility = Visibility.Collapsed;
+            PreviousVideoViewbox.Visibility = Visibility.Collapsed;
+        }
+        else if (_lastVideoSource != null)
+        {
+            PreviousVideoPlayer.Source = _lastVideoSource;
+            PreviousVideoViewbox.Visibility = Visibility.Visible;
+            PreviousVideoViewbox.Opacity = 1.0;
+            // Hide other previous elements
+            PreviousImageViewbox.Visibility = Visibility.Collapsed;
+            PreviousGifViewbox.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            // No previous content to capture (first image)
+            HidePreviousElements();
+        }
+
+        // Update tracking for next transition
+        UpdateLastShownContent();
+    }
+
+    private void UpdateLastShownContent()
+    {
+        // Store current content for next transition
+        _lastImageSource = _viewModel.CurrentImageSource;
+        _lastGifSource = _viewModel.CurrentGifSource;
+        _lastVideoSource = _viewModel.CurrentVideoSource;
+    }
+
+    private void HidePreviousElements()
+    {
+        PreviousImageViewbox.Visibility = Visibility.Collapsed;
+        PreviousGifViewbox.Visibility = Visibility.Collapsed;
+        PreviousVideoViewbox.Visibility = Visibility.Collapsed;
+
+        PreviousImage.Source = null;
+        PreviousGifPlayer.Source = null;
+        PreviousVideoPlayer.Source = null;
     }
 }
