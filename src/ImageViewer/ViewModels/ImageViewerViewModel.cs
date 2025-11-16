@@ -33,6 +33,7 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
     private double _panX = 0;
     private double _panY = 0;
     private Stretch _stretchMode = Stretch.Uniform;
+    private TransitionEffect _currentTransition = TransitionEffect.None;
 
     public ImageViewerViewModel()
     {
@@ -267,6 +268,19 @@ public class ImageViewerViewModel : INotifyPropertyChanged, IDisposable
             if (_stretchMode != value)
             {
                 _stretchMode = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public TransitionEffect CurrentTransition
+    {
+        get => _currentTransition;
+        set
+        {
+            if (_currentTransition != value)
+            {
+                _currentTransition = value;
                 OnPropertyChanged();
             }
         }
